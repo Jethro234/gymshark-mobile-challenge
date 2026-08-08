@@ -23,13 +23,13 @@ instead, called out explicitly below.
 
 ## 2. Domain model (day 1, ~1.5h)
 
-- [ ] 2.1 Add `Money` as a value class over `Long` minor units with a single named conversion constant and a `fromMajorUnits` factory
-- [ ] 2.2 Test `Money`: `fromMajorUnits(65)` → £65.00, `fromMajorUnits(1000)` → £1,000.00 (rendered as supplied, not special-cased), zero, locale formatting, and the reversed minor-units interpretation
-- [ ] 2.3 Add `Label` as a sealed interface with the six known values across two categories (merchandising: `going-fast`, `new`, `limited-edition`, `popular`; sustainability: `recycled-nylon`, `recycled-polyester`) and `Unknown(raw)` defaulting to merchandising
-- [ ] 2.4 Test `Label` parsing: known values in both categories, case-insensitivity, whitespace trimming, unknown fallback defaulting to merchandising, null and empty arrays (both meaning no labels), and the at-most-one-merchandising-badge rule on a constructed two-merchandising-label fixture
-- [ ] 2.5 Add the `Product` domain type and the pure colour-normalisation function handling both `/` and ` | ` separators
-- [ ] 2.6 Test colour normalisation against both payload separators and the single-colour case
-- [ ] 2.7 Add the discount rule: on sale only when `compareAtPrice` is present and strictly greater than `price`; `discountPercentage` displayed as supplied, never recomputed. Test all four branches against constructed fixtures — `compareAtPrice` and `discountPercentage` are `null` on every product in the real payload, so this logic has no live example
+- [x] 2.1 Add `Money` as a value class over `Long` minor units with a single named conversion constant and a `fromMajorUnits` factory
+- [x] 2.2 Test `Money`: `fromMajorUnits(65)` → £65.00, `fromMajorUnits(1000)` → £1,000.00 (rendered as supplied, not special-cased), zero, locale formatting, and the reversed minor-units interpretation
+- [x] 2.3 Add `Label` as a sealed interface with the six known values across two categories (merchandising: `going-fast`, `new`, `limited-edition`, `popular`; sustainability: `recycled-nylon`, `recycled-polyester`) and `Unknown(raw)` defaulting to merchandising
+- [x] 2.4 Test `Label` parsing: known values in both categories, case-insensitivity, whitespace trimming, unknown fallback defaulting to merchandising, null and empty arrays (both meaning no labels), and the at-most-one-merchandising-badge rule on a constructed two-merchandising-label fixture
+- [x] 2.5 Add the `Product` domain type and the pure colour-normalisation function handling both `/` and ` | ` separators
+- [x] 2.6 Test colour normalisation against both payload separators and the single-colour case
+- [x] 2.7 Add the discount rule: on sale only when `compareAtPrice` is present and strictly greater than `price`; `discountPercentage` displayed as supplied, never recomputed. Test all four branches against constructed fixtures — `compareAtPrice` and `discountPercentage` are `null` on every product in the real payload, so this logic has no live example
 
 ## 3. HTML sanitiser (day 1, ~2h — written test-first)
 
