@@ -1,0 +1,5 @@
+# Machine-local agent permission grants — not shared configuration
+.claude/settings.local.json
+
+# macOS
+.DS_Store
