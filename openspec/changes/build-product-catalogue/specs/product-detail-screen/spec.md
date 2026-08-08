@@ -122,6 +122,34 @@ screen recreated.
 - **WHEN** the device is rotated after a size is selected
 - **THEN** the selection SHALL be retained
 
+### Requirement: Sustainability labels are shown as material chips near the description
+
+A product carrying sustainability labels (see `product-domain-model`) SHALL display each as
+a chip positioned after the hairline that follows the size chips, before the description.
+This is independent of whether the product also carries a merchandising label — the two
+categories render in different places and neither is affected by the other's presence or
+absence.
+
+#### Scenario: Product with sustainability labels
+
+- **WHEN** a product carries `"recycled-nylon"` and `"recycled-polyester"`
+- **THEN** two material chips SHALL be shown, positioned after the hairline and before the
+  description
+
+#### Scenario: Product with no sustainability labels
+
+- **WHEN** a product carries no sustainability labels
+- **THEN** no material chip row SHALL be shown and no space SHALL be reserved for one
+
+#### Scenario: Material chips and the merchandising badge are independent
+
+- **WHEN** a product carries both a merchandising label and sustainability labels — the real
+  payload contains exactly one such product, carrying `"new"`, `"recycled-nylon"` and
+  `"recycled-polyester"`
+- **THEN** the hero image badge SHALL show the merchandising label
+- **AND** the material chip row SHALL show both sustainability labels
+- **AND** neither SHALL be omitted, truncated, or combined into a single overflow indicator
+
 ### Requirement: The description is presented as the final content
 
 The content state SHALL end with the rendered description, separated from the sizes by a

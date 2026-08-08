@@ -23,13 +23,13 @@ instead, called out explicitly below.
 
 ## 2. Domain model (day 1, ~1.5h)
 
-- [ ] 2.1 Add `Money` as a value class over `Long` minor units with a single named conversion constant
-- [ ] 2.2 Test `Money`: 1000 → £10.00, 50 → £0.50, zero, locale formatting, and the reversed major-unit interpretation
-- [ ] 2.3 Add `Label` as a sealed interface with the four known values and `Unknown(raw)`
-- [ ] 2.4 Test `Label` parsing: known values, case-insensitivity, whitespace trimming, unknown fallback, null and empty arrays
+- [ ] 2.1 Add `Money` as a value class over `Long` minor units with a single named conversion constant and a `fromMajorUnits` factory
+- [ ] 2.2 Test `Money`: `fromMajorUnits(65)` → £65.00, `fromMajorUnits(1000)` → £1,000.00 (rendered as supplied, not special-cased), zero, locale formatting, and the reversed minor-units interpretation
+- [ ] 2.3 Add `Label` as a sealed interface with the six known values across two categories (merchandising: `going-fast`, `new`, `limited-edition`, `popular`; sustainability: `recycled-nylon`, `recycled-polyester`) and `Unknown(raw)` defaulting to merchandising
+- [ ] 2.4 Test `Label` parsing: known values in both categories, case-insensitivity, whitespace trimming, unknown fallback defaulting to merchandising, null and empty arrays (both meaning no labels), and the at-most-one-merchandising-badge rule on a constructed two-merchandising-label fixture
 - [ ] 2.5 Add the `Product` domain type and the pure colour-normalisation function handling both `/` and ` | ` separators
 - [ ] 2.6 Test colour normalisation against both payload separators and the single-colour case
-- [ ] 2.7 Add the discount rule: on sale only when `compareAtPrice` is present and strictly greater than `price`; `discountPercentage` displayed as supplied, never recomputed. Test all four branches
+- [ ] 2.7 Add the discount rule: on sale only when `compareAtPrice` is present and strictly greater than `price`; `discountPercentage` displayed as supplied, never recomputed. Test all four branches against constructed fixtures — `compareAtPrice` and `discountPercentage` are `null` on every product in the real payload, so this logic has no live example
 
 ## 3. HTML sanitiser (day 1, ~2h — written test-first)
 
@@ -46,7 +46,7 @@ instead, called out explicitly below.
 
 - [ ] 4.1 Add Algolia envelope and product DTOs with `ignoreUnknownKeys = true`, plus the Retrofit service
 - [ ] 4.2 Add the DTO → domain mapper handling null `labels`, `fit`, `compareAtPrice`, `discountPercentage` and `alt`, missing `featuredMedia`, and empty `media`
-- [ ] 4.3 Test the mapper against the committed payload — all ten hits map, and each null and multi-value case is asserted
+- [ ] 4.3 Test the mapper against the committed payload — all sixty hits map, and each null and multi-value case is asserted
 - [ ] 4.4 Add `ProductRepository` with an in-memory cache, `@Singleton`-scoped, exposing `getProducts()`, `getProduct(id)` and `refresh()`, with an injected dispatcher
 - [ ] 4.5 Implement and test `refresh()` bypassing the cache, and a cache hit avoiding a second network call
 - [ ] 4.6 Add `ErrorCause` — `NoConnection`, `Server`, `Malformed`, `NotFound`, `Unknown` — and map throwables to it
@@ -61,9 +61,10 @@ instead, called out explicitly below.
 - [ ] 5.3 Add the type scale, spacing scale and corner radii tokens; all text in `sp`, no elevation anywhere
 - [ ] 5.4 Add `GsAsyncImage` wrapping `AsyncImage` with loading, loaded and error states sharing one shape instance, aspect ratio reserved from payload dimensions, and explicit size hints
 - [ ] 5.5 Implement the `contentDescription` fallback: `alt` when present, product title otherwise
-- [ ] 5.6 Add `GsLabelBadge` with all five treatments, including the quiet outlined `Unknown` treatment showing the raw value title-cased
-- [ ] 5.7 Add `GsSizeChip` with selected, available and out-of-stock states, the out-of-stock state carrying a `stateDescription`
-- [ ] 5.8 Add `GsProductCard` with intrinsic height, two-line title clamp and one-line colourway clamp
+- [ ] 5.6 Add `GsLabelBadge` for merchandising labels only, with the two visual tiers (urgency: going fast/limited edition; informational: new/popular) plus the quiet outlined `Unknown` treatment showing the raw value title-cased
+- [ ] 5.7 Add `GsMaterialChip` for sustainability labels, reusing the `success` token pair freed up now that "back in stock" isn't a real label
+- [ ] 5.8 Add `GsSizeChip` with selected, available and out-of-stock states, the out-of-stock state carrying a `stateDescription`
+- [ ] 5.9 Add `GsProductCard` with intrinsic height, two-line title clamp and one-line colourway clamp
 
 ## 6. Product list (day 2, ~2.5h)
 
@@ -87,6 +88,7 @@ instead, called out explicitly below.
 - [ ] 7.7 Run the app on a device or emulator and manually confirm the description renders real bullets with hanging indentation, **before** building out the rest of the screen. No automated test can check this — `AnnotatedString.fromHtml` needs an Android runtime and there is no snapshot layer (`design.md` §8). If bullets do not render, treat it as a version-floor defect; do not work around it with bullet characters as text
 - [ ] 7.8 Build out the remaining screen: hero image with badge, thumbnail strip with selection outline, title, colourway, type, price
 - [ ] 7.9 Add the size chip row driven by real per-size `inStock` data, out-of-stock chips disabled and unselectable
+- [ ] 7.10 Add the material chip row (`GsMaterialChip` per sustainability label) after the hairline, before the description; shown independently of whether the hero badge is also showing a merchandising label. Verify against the one real product carrying `new` plus both recycled labels — badge and chips both present, no overflow handling needed
 
 ## 8. Navigation and wiring (day 3, ~0.5h)
 
@@ -101,11 +103,10 @@ instead, called out explicitly below.
 
 ## 10. Performance (day 3, ~1h)
 
-- [ ] 10.1 Add the `:macrobenchmark` module with `FrameTimingMetric` and `StartupTimingMetric`
-- [ ] 10.2 Add the `benchmark` build variant repeating the committed fixtures to ~500 items, wired so the shipped app is unaffected
-- [ ] 10.3 Generate the Baseline Profile with `BaselineProfileRule`; enable R8 full mode on release
-- [ ] 10.4 Run the Compose compiler stability report and act on what it flags
-- [ ] 10.5 Leave every `TBC` in `docs/PERFORMANCE.md` untouched — a human runs the benchmark on a physical device and fills them in
+- [ ] 10.1 Add the `:macrobenchmark` module with `FrameTimingMetric` and `StartupTimingMetric`, measured against the real sixty-product dataset — no synthetic `benchmark` build variant needed; thirty rows is a real scroll (see `design.md` §9)
+- [ ] 10.2 Generate the Baseline Profile with `BaselineProfileRule`; enable R8 full mode on release
+- [ ] 10.3 Run the Compose compiler stability report and act on what it flags
+- [ ] 10.4 Leave every `TBC` in `docs/PERFORMANCE.md` untouched — a human runs the benchmark on a physical device and fills them in
 
 ## 11. Final pass (day 3, ~1.5h)
 

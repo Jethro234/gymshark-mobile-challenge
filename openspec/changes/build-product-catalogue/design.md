@@ -37,7 +37,7 @@ record of cuts) → `DESIGN.md` → `CONVENTIONS.md`.
 
 - Persistence of any kind. No disk cache, no database, no favourites.
 - Any adaptive or multi-pane layout. Phone portrait and landscape only.
-- Pagination. The endpoint returns a complete ten-item response with no cursor.
+- Pagination. The endpoint returns a complete sixty-item response with no cursor.
 - Production observability. `docs/PERFORMANCE.md` §7 records what it would be; none of it is
   built.
 
@@ -217,15 +217,39 @@ Hand-written fakes throughout, no mocking library: fakes make tests read as scen
 signature changes, and make it structurally awkward to assert on interactions when behaviour is
 what matters.
 
-### 9. The benchmark measures a harness, and says so
+### 9. The benchmark measures the real dataset — no synthetic harness
 
-Ten products in a two-column grid is five rows — there is not enough content to fling, so frame
-timing over it would be noise presented as evidence. A `benchmark` build variant repeats the
-committed fixtures to ~500 items to produce a real scroll.
+The original plan assumed ten products — five rows in a two-column grid, not enough to
+fling — and built a `benchmark` build variant repeating the fixtures to ~500 items so
+`FrameTimingMetric` would have a real scroll to measure. The real payload has sixty
+products: thirty rows, a genuine fling with nothing synthetic added. Every figure in
+`PERFORMANCE.md`, including the scroll numbers, is now measured against the shipped
+dataset directly — no separate variant, no "measurement harness, not production behaviour"
+caveat to carry. Startup timing and the Baseline Profile comparison were always honest on
+the real app either way.
 
-This is the one place the measured artefact differs from the shipped one, so every table using
-it is labelled. Startup timing and the Baseline Profile comparison run against the real app and
-carry no caveat.
+### 10. Labels split into two categories, resolved by where they render
+
+The real payload's six label values split cleanly along a distinction retail already
+treats differently: merchandising (`going-fast`, `new`, `limited-edition`, `popular` —
+urgency and novelty) versus sustainability (`recycled-nylon`, `recycled-polyester` —
+material provenance). This is not a stylistic choice; it resolves a real layout problem.
+One product carries three labels at once (`new`, `recycled-nylon`, `recycled-polyester`),
+and the image badge slot (`GsLabelBadge`) is a single pill with no stacking or overflow
+affordance designed into it.
+
+Categorising by intent gives each label exactly one home: merchandising labels compete for
+the one badge slot on the image (at most one is ever shown — no product in the payload
+carries more than one, though the rule for a hypothetical second is first-by-array-order,
+covered by a constructed fixture); sustainability labels render as `GsMaterialChip`s near
+the description on the detail screen, additive and independent of the badge. The
+three-label product resolves to one badge (`New`) and two chips, with nothing invented to
+handle overflow because there is no overflow — each label has exactly one place to go.
+
+**Rejected:** a flat `Label` list with a stacking or "+2" rule for the badge slot (works,
+but invents UI for a case a category split avoids needing at all); treating sustainability
+labels as `Unknown` (technically handles them without crashing, but throws away genuine
+material information the brief's "reflect labels as indicators" is asking for).
 
 ## Risks / Trade-offs
 
@@ -236,7 +260,7 @@ carry no caveat.
 | **Convention plugins fight back** → build-logic eats the foundation budget | Timebox 2h. Fallback is plain build files across six modules — uglier, not fatal |
 | **Navigation 3 APIs differ from those recorded** → nav wiring stalls on day 3 | Verify the published artifacts, including `lifecycle-viewmodel-navigation3`, when the catalog is written on day 1 rather than when nav is wired |
 | **Six modules for two screens** | Accepted deliberately. The brief is a demonstration of structural judgement, and the convention-plugin setup is part of the answer |
-| **The minor-units assumption is wrong** | Single named constant, both interpretations covered by tests, assumption stated in the README. A one-line reversal |
+| **The major-units assumption is wrong** (reversed from minor-units once the real payload's price distribution contradicted it) | Single named constant (`Money.fromMajorUnits`), both interpretations covered by tests, assumption stated in the README. A one-line reversal either way |
 | **Day 3 runs over** | Cut in the order fixed by `docs/SCOPE.md` §5: benchmark scroll → instrumented tests → CI. Never the HTML rendering, image error state, label indicators, unit suite or README |
 
 **Realised, not just a risk — Paparazzi is absent.** The pre-authorised "Paparazzi/JDK friction"
@@ -249,9 +273,10 @@ its place.
 connectivity shows the error state rather than content. Correct for ten products that never
 change; recorded in the README as deferred.
 
-**Accepted trade-off — the list ships flat.** The ten hits are five products in ten colourways
-and `handle` encodes it. Grouping would mean inventing a product model the search endpoint does
-not express. One README line converts a possible oversight into visible judgement.
+**Accepted trade-off — the list ships flat.** The sixty hits are twenty-one products in sixty
+colourways and `handle` encodes it. Grouping would mean inventing a product model the search
+endpoint does not express. One README line converts a possible oversight into visible
+judgement.
 
 ## Open Questions
 

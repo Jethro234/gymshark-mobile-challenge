@@ -116,13 +116,14 @@ colourways to one, without a fixed item height.
 - **WHEN** a normalised colourway exceeds one line
 - **THEN** it SHALL be truncated at one line
 
-### Requirement: Labels are rendered as visible indicators on the item
+### Requirement: Merchandising labels are rendered as visible indicators on the item
 
-A product carrying labels SHALL display them as badges inset within the product image. Known
-labels SHALL each have a distinct treatment; an unknown label SHALL render with its raw value
-title-cased in the quietest treatment, visible but not competing with recognised labels.
+A product carrying a merchandising label (see `product-domain-model`) SHALL display it as a
+badge inset within the product image. Sustainability labels do not appear here — they render
+on the detail screen (see `product-detail-screen`), not on the grid item. At most one badge
+SHALL be shown per item.
 
-#### Scenario: Known label
+#### Scenario: Known merchandising label
 
 - **WHEN** a product carries `"going-fast"`
 - **THEN** a "Going fast" badge SHALL be displayed inset within the image
@@ -131,12 +132,19 @@ title-cased in the quietest treatment, visible but not competing with recognised
 
 - **WHEN** a product carries a label outside the known set
 - **THEN** a badge SHALL be displayed showing the raw value title-cased
-- **AND** it SHALL use the outlined, lowest-emphasis treatment
+- **AND** it SHALL use the outlined, lowest-emphasis treatment, visually distinct from both
+  known-label treatments
 
 #### Scenario: No labels
 
 - **WHEN** a product's labels are absent or empty
 - **THEN** no badge SHALL be displayed and no space SHALL be reserved for one
+
+#### Scenario: A product with only sustainability labels shows no badge
+
+- **WHEN** a product carries sustainability labels but no merchandising label
+- **THEN** no badge SHALL be displayed on the grid item
+- **AND** the sustainability labels SHALL remain available for the detail screen
 
 ### Requirement: Selecting a product opens its detail screen
 

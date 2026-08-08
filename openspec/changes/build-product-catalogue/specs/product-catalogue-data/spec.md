@@ -55,15 +55,16 @@ optional and SHALL have a defined behaviour when absent.
 
 ### Requirement: The product list is presented flat
 
-The ten payload hits are five distinct products in ten colourways. The list SHALL present
-every hit as its own item, in the order the endpoint returns them. Hits MUST NOT be grouped,
-deduplicated or reordered by title, handle or colour.
+The sixty payload hits are twenty-one distinct products in sixty colourways. The list SHALL
+present every hit as its own item, in the order the endpoint returns them. Hits MUST NOT be
+grouped, deduplicated or reordered by title, handle or colour.
 
 #### Scenario: All hits appear as separate items
 
-- **WHEN** the committed payload of ten hits is mapped
-- **THEN** ten separate products SHALL be presented
-- **AND** the three `Speed Leggings` colourways SHALL each appear as their own item
+- **WHEN** the committed payload of sixty hits is mapped
+- **THEN** sixty separate products SHALL be presented
+- **AND** the six `Adapt Camo Seamless Leggings` colourways SHALL each appear as their own
+  item
 
 ### Requirement: Products are served from an in-memory cache after first load
 

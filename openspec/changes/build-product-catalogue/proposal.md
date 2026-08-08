@@ -18,8 +18,10 @@ scenarios rather than by prose in a design document.
   `https://cdn.develop.gymshark.com/training/mock-product-responses/algolia-example-payload.json`
   is fetched once and committed verbatim to `:core:testing` resources. Every mapper test, the
   sanitiser golden, the broken-image fixture and the benchmark dataset depend on it.
-- **A pure domain model.** `Product`, `Money` (minor units, never `Double`), `Label` with an
-  `Unknown(raw)` fallback, and multi-value colour normalisation across both payload separators.
+- **A pure domain model.** `Product`, `Money` (stored internally as minor units, never
+  `Double`, mapped from the payload's major-unit values), `Label` split into merchandising
+  and sustainability categories with an `Unknown(raw)` fallback, and multi-value colour
+  normalisation across both payload separators.
 - **A data layer.** Retrofit + kotlinx.serialization DTOs, a mapper tolerant of the payload's
   nulls, an in-memory-cached repository, refresh that bypasses the cache, and typed error
   causes including `NotFound`.
@@ -45,8 +47,10 @@ recorded as deferred decisions.
 
 ### New Capabilities
 
-- `product-domain-model`: Domain types and their observable behaviour — money in minor units,
-  label parsing with an unknown fallback, colour normalisation.
+- `product-domain-model`: Domain types and their observable behaviour — money mapped from
+  major units into an internal minor-units representation, label parsing across
+  merchandising and sustainability categories with an unknown fallback, colour
+  normalisation.
 - `product-catalogue-data`: Fetching, parsing and caching the Algolia payload, refresh
   semantics, and the typed error causes surfaced to the UI.
 - `html-description-rendering`: Sanitising hostile CMS HTML and rendering it as a heading,
