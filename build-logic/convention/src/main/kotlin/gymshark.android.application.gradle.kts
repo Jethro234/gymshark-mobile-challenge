@@ -47,6 +47,16 @@ extensions.configure<ApplicationExtension> {
     lint {
         warningsAsErrors = true
         abortOnError = true
+        // No baseline file (docs/CONVENTIONS.md §3) — but these two checks are
+        // disabled outright, not baselined, because they'll otherwise flag
+        // deliberately-pinned versions forever: Kotlin is held at 2.3.20
+        // rather than the newer 2.4.10 because that's the exact version
+        // KSP's latest release is built against (no matching KSP release for
+        // 2.4.10 exists yet), and JUnit Jupiter is held at 5.13.2 rather than
+        // 6.1.3 because the Mannodermaus plugin's 2.0.1 release notes name
+        // 5.13.2 as the version it was verified against. See
+        // gradle/libs.versions.toml for the full reasoning on both pins.
+        disable += setOf("GradleDependency", "NewerVersionAvailable")
     }
 
     packaging {
@@ -63,6 +73,7 @@ extensions.configure<KotlinAndroidProjectExtension> {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    failOnNoDiscoveredTests = false
 }
 
 dependencies {

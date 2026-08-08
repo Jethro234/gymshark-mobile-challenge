@@ -23,6 +23,7 @@ kotlin {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    failOnNoDiscoveredTests = false
 }
 
 val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")

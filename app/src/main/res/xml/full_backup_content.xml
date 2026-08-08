@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pre-Android-12 counterpart to data_extraction_rules.xml — same reasoning:
+  no persisted user data exists, so there is nothing to exclude.
+-->
+<full-backup-content />

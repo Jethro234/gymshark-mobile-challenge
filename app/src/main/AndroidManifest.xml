@@ -3,8 +3,8 @@
   Launcher icon is the system placeholder: docs/DESIGN.md specifies no
   launcher artwork. Swap for a real adaptive icon once one is designed.
 
-  The launcher activity, NavDisplay wiring and theme are added in task 9
-  (openspec/changes/build-product-catalogue/tasks.md group 9) alongside
+  The launcher activity, NavDisplay wiring and theme are added in group 8
+  (openspec/changes/build-product-catalogue/tasks.md) alongside
   Navigation 3.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -12,6 +12,8 @@
     <application
         android:name=".GymsharkApplication"
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/full_backup_content"
         android:icon="@android:drawable/sym_def_app_icon"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
