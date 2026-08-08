@@ -131,19 +131,24 @@ SHALL draw actual bullets with hanging indentation.
 ### Requirement: The rendering library floor is pinned and verified
 
 Bullet rendering depends on a minimum Compose `ui-text` version. That floor SHALL be pinned in
-the version catalog, and bullet rendering SHALL be verified by a committed snapshot before the
-detail screen is considered complete.
+the version catalog, and bullet rendering SHALL be verified by running the detail screen on a
+device or emulator before the screen is considered complete. No automated test layer in this
+project can exercise `AnnotatedString.fromHtml` — it requires an Android runtime, which is
+unavailable to the JVM unit suite, and there is no snapshot or Robolectric layer to bridge the
+gap (both cut; see `design.md`).
 
 #### Scenario: Version floor is enforced
 
 - **WHEN** the Compose dependency set is resolved
 - **THEN** `ui-text` SHALL be at version 1.9 or later
 
-#### Scenario: Bullet rendering is pinned by a snapshot
+#### Scenario: Bullet rendering is confirmed by manual verification
 
-- **WHEN** the snapshot suite runs
-- **THEN** a committed golden SHALL show the rendered description including its bullet list
-- **AND** a regression in bullet rendering SHALL fail that test
+- **WHEN** the detail screen is run on a device or emulator against the real sanitised
+  description
+- **THEN** the rendered output SHALL show actual bullets with hanging indentation
+- **AND** this check SHALL be performed before the detail screen is considered complete, not
+  deferred to final review
 
 ### Requirement: Conversion to styled text runs once per description
 

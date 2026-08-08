@@ -4,8 +4,12 @@ Ordered so that if time runs out, what exists is coherent rather than half-wired
 to `docs/SCOPE.md` §3; the cut order if day 3 overruns is fixed in `docs/SCOPE.md` §5.
 
 Every task ends at the definition of done in `AGENTS.md` §6 — compiles with warnings as errors,
-static analysis clean, tests written and passing, goldens recorded where the change is visual,
-no `!!`/`lateinit`/`TODO`, one Conventional Commit scoped by module.
+static analysis clean, tests written and passing, no `!!`/`lateinit`/`TODO`, one Conventional
+Commit scoped by module. There is no snapshot test layer (Paparazzi's Gradle plugin is
+incompatible with the AGP version Hilt requires — see `design.md` §8), so "goldens recorded
+where the change is visual" from the original definition of done does not apply; the two places
+that would have relied on one (bullet rendering, RTL mirroring) are manual on-device checks
+instead, called out explicitly below.
 
 ## 1. Prerequisite and foundation (day 1, ~2.25h)
 
@@ -55,7 +59,7 @@ no `!!`/`lateinit`/`TODO`, one Conventional Commit scoped by module.
 - [ ] 5.1 Write the WCAG AA contrast test over every token pair **before** the tokens are consumed by any screen
 - [ ] 5.2 Add the colour tokens for light and dark from `docs/DESIGN.md` §1, including the corrected `textMuted` values, and make the contrast test pass
 - [ ] 5.3 Add the type scale, spacing scale and corner radii tokens; all text in `sp`, no elevation anywhere
-- [ ] 5.4 Add `GsAsyncImage` wrapping `AsyncImage` with loading, loaded and error states sharing one shape instance, aspect ratio reserved from payload dimensions, size hints, and a deterministic state seam for snapshot tests
+- [ ] 5.4 Add `GsAsyncImage` wrapping `AsyncImage` with loading, loaded and error states sharing one shape instance, aspect ratio reserved from payload dimensions, and explicit size hints
 - [ ] 5.5 Implement the `contentDescription` fallback: `alt` when present, product title otherwise
 - [ ] 5.6 Add `GsLabelBadge` with all five treatments, including the quiet outlined `Unknown` treatment showing the raw value title-cased
 - [ ] 5.7 Add `GsSizeChip` with selected, available and out-of-stock states, the out-of-stock state carrying a `stateDescription`
@@ -70,59 +74,44 @@ no `!!`/`lateinit`/`TODO`, one Conventional Commit scoped by module.
 - [ ] 6.5 Build the grid screen — wordmark, title, count, two-column `LazyVerticalGrid` with stable `key` and `contentType`, `safeDrawing` content padding, edge to edge
 - [ ] 6.6 Add pull-to-refresh, and the error state with its per-cause message and retry action
 - [ ] 6.7 Add scroll position restoration via `rememberSaveable`
+- [ ] 6.8 Run the app on a device or emulator with the layout direction forced to right-to-left and confirm the list screen mirrors correctly — all padding/alignment via `start`/`end`, back and directional icons flipped. Manual check; no automated snapshot layer exists to pin it
 
-## 7. Snapshot testing, tier 1 (day 2, ~1.5h)
+## 7. Product detail (day 3, ~3h)
 
-- [ ] 7.1 Set up Paparazzi with a shared base in `:core:testing`. Timebox 45 minutes on version friction; if unresolved, drop the layer and say so
-- [ ] 7.2 Record list screen goldens: Loading, Content, Empty, Error(NoConnection) — light and dark
-- [ ] 7.3 Record product card goldens: Going fast, Unknown label, On sale, Image error — light
-- [ ] 7.4 Record the product card at font scale 2.0, light
-- [ ] 7.5 Record the list screen in RTL, light
-- [ ] 7.6 Record the bullet-rendering proof golden for the sanitised description **before** building the detail screen out
+- [ ] 7.1 Add `ProductDetailUiState` with `Loading`, `Content` and `Error(cause)`, its UI model carrying `heading: String?` and `bodyHtml: String` as plain strings
+- [ ] 7.2 Add `ProductDetailViewModel` resolving the product by id, with `SavedStateHandle` for the selected size
+- [ ] 7.3 Test cache-miss refetch: empty cache → Loading → Content, using a fake whose cache starts empty
+- [ ] 7.4 Test refetch succeeding without the requested id → `Error(NotFound)`, and refetch failing → the corresponding typed cause
+- [ ] 7.5 Test that the selected size survives process death via `SavedStateHandle`
+- [ ] 7.6 Build a minimal detail screen shell and render the description: `heading` in the `eyebrow` style, body via `remember(bodyHtml) { AnnotatedString.fromHtml(bodyHtml) }`
+- [ ] 7.7 Run the app on a device or emulator and manually confirm the description renders real bullets with hanging indentation, **before** building out the rest of the screen. No automated test can check this — `AnnotatedString.fromHtml` needs an Android runtime and there is no snapshot layer (`design.md` §8). If bullets do not render, treat it as a version-floor defect; do not work around it with bullet characters as text
+- [ ] 7.8 Build out the remaining screen: hero image with badge, thumbnail strip with selection outline, title, colourway, type, price
+- [ ] 7.9 Add the size chip row driven by real per-size `inStock` data, out-of-stock chips disabled and unselectable
 
-## 8. Product detail (day 3, ~3h)
+## 8. Navigation and wiring (day 3, ~0.5h)
 
-- [ ] 8.1 Add `ProductDetailUiState` with `Loading`, `Content` and `Error(cause)`, its UI model carrying `heading: String?` and `bodyHtml: String` as plain strings
-- [ ] 8.2 Add `ProductDetailViewModel` resolving the product by id, with `SavedStateHandle` for the selected size
-- [ ] 8.3 Test cache-miss refetch: empty cache → Loading → Content, using a fake whose cache starts empty
-- [ ] 8.4 Test refetch succeeding without the requested id → `Error(NotFound)`, and refetch failing → the corresponding typed cause
-- [ ] 8.5 Test that the selected size survives process death via `SavedStateHandle`
-- [ ] 8.6 Build the detail screen: hero image with badge, thumbnail strip with selection outline, title, colourway, type, price
-- [ ] 8.7 Add the size chip row driven by real per-size `inStock` data, out-of-stock chips disabled and unselectable
-- [ ] 8.8 Render the description: `heading` in the `eyebrow` style, body via `remember(bodyHtml) { AnnotatedString.fromHtml(bodyHtml) }`, bullets confirmed against the task 7.6 golden
-- [ ] 8.9 Record detail screen content goldens, light and dark
+- [ ] 8.1 Add the Hilt application root and modules — `@Singleton` for `OkHttpClient`, Retrofit and `ProductRepository`
+- [ ] 8.2 Wire `NavDisplay` with `@Serializable` route keys, passing the product id only, and both entry decorators so ViewModels scope to the `NavEntry` and clear on pop
+- [ ] 8.3 Verify predictive back, and that the back icon uses an `AutoMirrored` variant
 
-## 9. Navigation and wiring (day 3, ~0.5h)
+## 9. Instrumented tests (day 3, ~0.5h — first cut after benchmark scroll)
 
-- [ ] 9.1 Add the Hilt application root and modules — `@Singleton` for `OkHttpClient`, Retrofit and `ProductRepository`
-- [ ] 9.2 Wire `NavDisplay` with `@Serializable` route keys, passing the product id only, and both entry decorators so ViewModels scope to the `NavEntry` and clear on pop
-- [ ] 9.3 Verify predictive back, and that the back icon uses an `AutoMirrored` variant
+- [ ] 9.1 Test: tapping a product navigates to the correct detail screen, and system back returns to the list with scroll position preserved
+- [ ] 9.2 Test: the error state's retry action recovers to content, with `FakeProductRepository` injected via `@TestInstallIn`
 
-## 10. Instrumented tests (day 3, ~0.5h — first cut after benchmark scroll)
+## 10. Performance (day 3, ~1h)
 
-- [ ] 10.1 Test: tapping a product navigates to the correct detail screen, and system back returns to the list with scroll position preserved
-- [ ] 10.2 Test: the error state's retry action recovers to content, with `FakeProductRepository` injected via `@TestInstallIn`
+- [ ] 10.1 Add the `:macrobenchmark` module with `FrameTimingMetric` and `StartupTimingMetric`
+- [ ] 10.2 Add the `benchmark` build variant repeating the committed fixtures to ~500 items, wired so the shipped app is unaffected
+- [ ] 10.3 Generate the Baseline Profile with `BaselineProfileRule`; enable R8 full mode on release
+- [ ] 10.4 Run the Compose compiler stability report and act on what it flags
+- [ ] 10.5 Leave every `TBC` in `docs/PERFORMANCE.md` untouched — a human runs the benchmark on a physical device and fills them in
 
-## 11. Performance (day 3, ~1h)
+## 11. Final pass (day 3, ~1.5h)
 
-- [ ] 11.1 Add the `:macrobenchmark` module with `FrameTimingMetric` and `StartupTimingMetric`
-- [ ] 11.2 Add the `benchmark` build variant repeating the committed fixtures to ~500 items, wired so the shipped app is unaffected
-- [ ] 11.3 Generate the Baseline Profile with `BaselineProfileRule`; enable R8 full mode on release
-- [ ] 11.4 Run the Compose compiler stability report and act on what it flags
-- [ ] 11.5 Leave every `TBC` in `docs/PERFORMANCE.md` untouched — a human runs the benchmark on a physical device and fills them in
-
-## 12. Final pass (day 3, ~1.5h)
-
-- [ ] 12.1 Add the CI workflow: ktlint → detekt → lint → JVM unit tests → Paparazzi verify → `assembleRelease`, no secrets, no benchmarks
-- [ ] 12.2 Fix the stale documentation lines — Robolectric in `docs/CONVENTIONS.md` §2 and §5, the "two tests / four bullets" mismatch in `docs/ARCHITECTURE.md` §9.3, and the snapshot-coverage overstatement in the README testing table
-- [ ] 12.3 Report Kover coverage for `:core:model` and `:core:data` and quote it in the README with the deliberately-untested list
-- [ ] 12.4 Run a TalkBack pass and an RTL pass on device, and record the result in the README
-- [ ] 12.5 Remove the agent note comment from the README, and confirm no screenshot, performance figure or placeholder has been invented
-- [ ] 12.6 Generate README screenshots from the committed goldens — human only
-
-## 13. Tier 2 snapshots (only if time remains)
-
-- [ ] 13.1 Remaining `ErrorCause` variants and the refreshing state on the list screen
-- [ ] 13.2 Remaining label badge treatments
-- [ ] 13.3 Long title and long colourway truncation
-- [ ] 13.4 Size chip states, and detail screen Loading and Error
+- [ ] 11.1 Add the CI workflow: ktlint → detekt → lint → JVM unit tests → `assembleRelease`, no secrets, no benchmarks
+- [ ] 11.2 Fix the stale documentation — Robolectric in `docs/CONVENTIONS.md` §2 and §5, the "two tests / four bullets" mismatch in `docs/ARCHITECTURE.md` §9.3, and every Paparazzi/snapshot reference in `README.md`'s testing table and `docs/DESIGN.md` §8 (the layer is entirely absent, not reduced — see `design.md` §8 of this change for why)
+- [ ] 11.3 Report Kover coverage for `:core:model` and `:core:data` and quote it in the README with the deliberately-untested list
+- [ ] 11.4 Run a TalkBack pass on device and record the result in the README (the RTL pass already happened manually in task 6.8 — record that result too)
+- [ ] 11.5 Remove the agent note comment from the README, and confirm no screenshot, performance figure or placeholder has been invented
+- [ ] 11.6 Generate README screenshots from the running app on a device or emulator — human only. (Originally planned from committed Paparazzi goldens; there are none)

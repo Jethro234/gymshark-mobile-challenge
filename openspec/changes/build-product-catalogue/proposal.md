@@ -32,7 +32,7 @@ scenarios rather than by prose in a design document.
   blanks content, and scroll restoration; a detail screen with hero, thumbnails, size chips,
   selected-size survival across process death, and the rendered description.
 - **A design system with verified accessibility.** Semantic tokens, a WCAG AA contrast test
-  written before the tokens are used, RTL support, and a pre-committed Tier 1 Paparazzi matrix.
+  written before the tokens are used, and RTL support.
 - **Quality and performance evidence.** Static analysis gates, a hand-written-fakes test
   strategy, a Macrobenchmark harness, and an absolute prohibition on fabricated figures.
 
@@ -59,9 +59,8 @@ recorded as deferred decisions.
   and recovery when a refetched payload no longer contains the requested product.
 - `design-system-and-accessibility`: Tokens, typography, contrast verification, RTL, touch
   targets and screen-reader semantics.
-- `engineering-quality-gates`: Definition of done, test strategy, static analysis, snapshot
-  coverage tiers, performance measurement method, and the honesty constraints on published
-  figures and screenshots.
+- `engineering-quality-gates`: Definition of done, test strategy, static analysis, performance
+  measurement method, and the honesty constraints on published figures and screenshots.
 
 ### Modified Capabilities
 
@@ -72,8 +71,9 @@ None — this is a greenfield repository with no existing specs.
 - **New code:** six modules (`:app`, `:core:model`, `:core:data`, `:core:designsystem`,
   `:core:testing`, `:feature:products`) plus `:macrobenchmark` and a `build-logic` included
   build supplying convention plugins.
-- **New committed assets:** the verbatim Algolia payload as a test resource, Paparazzi golden
-  images, a Baseline Profile, and detekt/ktlint configuration.
+- **New committed assets:** the verbatim Algolia payload as a test resource, a Baseline Profile,
+  and detekt/ktlint configuration. No snapshot goldens — Paparazzi's Gradle plugin is
+  incompatible with the AGP version Hilt requires; see `design.md`.
 - **Dependencies:** only those in `AGENTS.md` §4b. Notably `de.mannodermaus.android-junit5`
   (JUnit 5 in Android library modules) and a Compose BOM whose `ui-text` is 1.9 or later —
   the bullet-rendering floor. Adding anything else requires stopping and asking.

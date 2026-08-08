@@ -1,8 +1,10 @@
 ## Purpose
 
 Defines the verifiable standards the deliverable itself must meet — module boundaries, test
-strategy, static analysis, snapshot coverage, commit hygiene, performance measurement method —
-and the honesty constraints on every figure and image that reaches the submission.
+strategy, static analysis, commit hygiene, performance measurement method — and the honesty
+constraints on every figure and image that reaches the submission. There is no snapshot test
+layer: see `design.md` for why (Paparazzi's Gradle plugin is incompatible with the AGP version
+Hilt requires).
 
 ## ADDED Requirements
 
@@ -24,7 +26,7 @@ be real constraints rather than naming conventions.
 
 #### Scenario: Fixtures are defined once
 
-- **WHEN** a fixture is needed by unit tests, snapshot tests and instrumented tests
+- **WHEN** a fixture is needed by both unit tests and instrumented tests
 - **THEN** it SHALL be defined once in the shared testing module and reused
 
 ### Requirement: Test doubles are hand-written fakes
@@ -70,33 +72,6 @@ use them, because the corruption is the subject of the assertion.
 
 - **WHEN** a test asserts behaviour on a malformed or truncated body
 - **THEN** that body SHALL be declared within the test rather than in a separate resource file
-
-### Requirement: Snapshot coverage follows a pre-committed tier
-
-Snapshot goldens SHALL be committed as test expectations and verified on every build. Because
-the full matrix exceeds the time budget, a first tier SHALL be recorded from the start and a
-second tier recorded only if time remains.
-
-#### Scenario: Tier one is always present
-
-- **WHEN** the snapshot suite runs
-- **THEN** goldens SHALL exist for the list screen's loading, content, empty and no-connection
-  states in light and dark
-- **AND** for the product card's going-fast, unknown-label, on-sale and image-error variants
-- **AND** for the detail screen's content state in light and dark
-- **AND** for the product card at font scale 2.0
-- **AND** for the list screen in right-to-left layout
-
-#### Scenario: Detail content golden proves the graded work
-
-- **WHEN** the detail screen content golden is reviewed
-- **THEN** it SHALL show the rendered description including its heading and bullet list
-
-#### Scenario: Goldens are committed, not generated at verify time
-
-- **WHEN** the repository is cloned
-- **THEN** the golden images SHALL be present in version control
-- **AND** verification SHALL compare against them rather than regenerate them
 
 ### Requirement: Static analysis and compilation gates pass without new suppressions
 
@@ -152,8 +127,8 @@ tests, and SHALL follow Conventional Commits scoped to the six-module structure.
 ### Requirement: Continuous integration reproduces the local verification
 
 A single automated workflow SHALL run on push and pull request, executing formatting, static
-analysis, platform lint, JVM unit tests, snapshot verification and a release assembly. It SHALL
-require no secrets and SHALL be reproducible by anyone who clones the repository.
+analysis, platform lint, JVM unit tests and a release assembly. It SHALL require no secrets and
+SHALL be reproducible by anyone who clones the repository.
 
 #### Scenario: Workflow runs without configuration
 

@@ -122,10 +122,12 @@ Directional icons SHALL use automatically mirroring variants.
 - **WHEN** the layout direction is right to left
 - **THEN** the back icon SHALL point in the mirrored direction
 
-#### Scenario: Mirroring is pinned by a snapshot
+#### Scenario: Mirroring is confirmed on device
 
-- **WHEN** the snapshot suite runs
-- **THEN** a committed golden SHALL capture the list screen in right-to-left layout
+- **WHEN** the list screen is run on a device or emulator with the layout direction forced to
+  right-to-left
+- **THEN** the mirrored layout SHALL be visually confirmed before the screen is considered
+  complete, since no automated snapshot layer exists to pin it (see `design.md`)
 
 ### Requirement: Interactive elements meet minimum target size
 
