@@ -97,7 +97,14 @@ Stated rather than buried, because the payload is ambiguous in places.
    defaults to the merchandising `Unknown(raw)` branch rather than being dropped or
    crashing.
 4. **`discountPercentage` is displayed as supplied**, never recalculated — recomputing risks
-   disagreeing with the merchandiser's own figure.
+   disagreeing with the merchandiser's own figure. **`compareAtPrice` and
+   `discountPercentage` are `null` on all 60 products in this payload**, so the sale price,
+   strikethrough and discount badge are implemented and unit-tested against constructed
+   fixtures but not observable by running the app against the live payload. Kept rather than
+   cut: unlike an affordance such as "Add to bag", which has no schema backing at all, this
+   is genuine handling of a real, nullable payload field that simply isn't populated in this
+   particular dataset — the same treatment already given to `fit`, which is null on 58 of
+   60 products.
 5. **The endpoint is read-only and unauthenticated.**
 
 ---

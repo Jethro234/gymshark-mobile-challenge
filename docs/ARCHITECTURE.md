@@ -288,9 +288,10 @@ value class Money(val minorUnits: Long) {
 - `compareAtPrice` non-null and greater than `price` drives the strikethrough and the
   discount badge; `discountPercentage` is displayed only when present, never recomputed
   (recomputing risks disagreeing with the merchandiser's own figure). Both fields are
-  `null` on every product in the committed payload, which is a separate, still-open
-  question about whether this logic ships as live-reachable UI or as fixture-tested-only
-  domain handling — not resolved by this section.
+  `null` on every product in the committed payload, so this logic is real, implemented and
+  unit-tested against constructed fixtures, but not observable by running the app against
+  the live payload — the same schema-driven-nullable-field treatment already given to
+  `fit` (§15).
 
 ---
 
@@ -700,9 +701,12 @@ what I fixed" is a stronger artefact than a clean report with no evidence of hav
    API supplied one.
 3. The six observed label values split into merchandising and sustainability categories
    (§8); an unrecognised future value defaults to the merchandising `Unknown` treatment.
-4. `discountPercentage` is displayed as supplied, never recalculated. Whether the
-   discount UI ships as live-reachable or fixture-tested-only, given `compareAtPrice` and
-   `discountPercentage` are `null` on every product in this payload, is still open.
+4. `discountPercentage` is displayed as supplied, never recalculated. `compareAtPrice` and
+   `discountPercentage` are `null` on every product in this payload, so the discount
+   treatment ships implemented and fixture-tested but not live-reachable — kept rather than
+   cut, since it is genuine nullable-field handling for a real schema field, not an
+   affordance invented from nothing (unlike "Add to bag", which has no schema backing at
+   all). Stated plainly in the README rather than left for a reviewer to notice.
 5. The endpoint is treated as read-only and unauthenticated.
 
 ---
