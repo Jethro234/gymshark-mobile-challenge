@@ -79,13 +79,23 @@ Minimum SDK 26. No API keys or local configuration required.
 
 Stated rather than buried, because the payload is ambiguous in places.
 
-1. **`price` and `compareAtPrice` are in minor units.** `1000` renders as £10.00, `50` as
-   £0.50. Shopify and Algolia conventionally store minor units. Note the payload is placeholder data — nine products at exactly `1000` and one at `50` — so neither reading yields a plausible retail price, and the argument rests on the storage convention, not on the figures. The scale is a single named constant, so reversing this is a
-   one-line change, and both readings are covered by tests.
+1. **`price` and `compareAtPrice` are in major units, not minor units.** `1000` renders as
+   £1,000.00, `65` as £65.00. The real payload has 54 products at exactly `1000` and six at
+   `50`/`60`/`65` — under a minor-units reading those six become £0.50/£0.60/£0.65, which
+   isn't plausible for leggings; under major units they're £50/£60/£65, which is. `1000`
+   then looks like an unset default on the other 54 products, but it is **rendered as
+   supplied — £1,000.00 — not special-cased**, since guessing at what a placeholder "should"
+   mean would be inventing behaviour the API doesn't state. The scale is a single named
+   constant, so reversing this reading is a one-line change, and both interpretations are
+   covered by tests.
 2. **Currency is GBP**, formatted via `NumberFormat` — the API supplies no currency code.
-3. **Label vocabulary is inferred.** Only `going-fast` appears in the payload. Known labels
-   are typed; anything else renders through an `Unknown(raw)` branch rather than being
-   dropped or crashing.
+3. **The six observed label values split into two categories.** Merchandising
+   (`going-fast`, `new`, `limited-edition`, `popular`) renders as the existing image badge;
+   sustainability (`recycled-nylon`, `recycled-polyester`) renders as material chips on the
+   detail screen. One product carries both — `new` plus both recycled labels — which the
+   split resolves without a stacking or "+2" affordance. An unrecognised future label
+   defaults to the merchandising `Unknown(raw)` branch rather than being dropped or
+   crashing.
 4. **`discountPercentage` is displayed as supplied**, never recalculated — recomputing risks
    disagreeing with the merchandiser's own figure.
 5. **The endpoint is read-only and unauthenticated.**
@@ -129,11 +139,11 @@ an error-free experience, so failure is demonstrated deliberately:
 
 Choices with reasons, not a list of unfinished work:
 
-- **Colourway grouping.** The ten `hits` are five products in ten colours — `Speed Leggings`
-  appears three times, and `handle` encodes the variant
-  (`gymshark-speed-leggings-navy-ss22`). The list ships flat because that is what the search
-  endpoint returns; grouping into one card with colour swatches would mean inventing a
-  product model the API does not express.
+- **Colourway grouping.** The sixty `hits` are twenty-one products in sixty colours — `Adapt
+  Camo Seamless Leggings` and `WTFlex Seamless High Waisted Leggings` each appear six times,
+  and `handle` encodes the variant (`gymshark-speed-leggings-navy-ss22`). The list ships flat
+  because that is what the search endpoint returns; grouping into one card with colour
+  swatches would mean inventing a product model the API does not express.
 - **Adaptive two-pane layout** for tablets and foldables. Navigation 3 makes this
   inexpensive; omitted for time rather than for doubt.
 - **Disk cache**, so a first launch while offline shows content rather than an error state.

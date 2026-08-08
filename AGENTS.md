@@ -100,9 +100,8 @@ https://cdn.develop.gymshark.com/training/mock-product-responses/algolia-example
 `core/testing/src/main/resources/algolia-example-payload.json`. Do not hand-write, trim,
 reformat or "tidy" it — the Word-mangled HTML and the `null` labels are the point.
 
-Everything downstream depends on this file: mapper tests, the `HtmlSanitiser` golden, the
-deliberately-broken image fixture, and the benchmark's repeated dataset. **It is a hard
-prerequisite, not a parallel task.**
+Everything downstream depends on this file: mapper tests, the `HtmlSanitiser` golden, and the
+deliberately-broken image fixture. **It is a hard prerequisite, not a parallel task.**
 
 The brief (*Mobile Engineering Challenge v2*, July 26) is not in the repository. Its
 requirements are reproduced in `docs/ARCHITECTURE.md` §1; treat that table as the
@@ -142,12 +141,20 @@ and needs only the standard JUnit 5 platform.
 `docs/ARCHITECTURE.md` §2 records what the payload actually contains, including the traps.
 Before writing a mapper, read it. Summary of the things that break naive implementations:
 
-- `labels` is `null` on nine of ten products.
-- `price` is minor units — `1000` is £10.00.
+- `labels` is `null` on 51 of 60 products (plus one explicit empty array — same meaning as
+  `null`). The six observed values split into two categories: merchandising (`going-fast`,
+  `new`, `limited-edition`, `popular`) and sustainability (`recycled-nylon`,
+  `recycled-polyester`). One product carries three labels at once — one merchandising, two
+  sustainability.
+- `price` is major units — `1000` is £1,000.00, rendered as supplied, not treated as a
+  placeholder. `50`/`60`/`65` on the other six products are genuine Gymshark pricing; reading
+  them as minor units instead would make them £0.50/£0.60/£0.65, which is what disproved the
+  original minor-units assumption.
 - `colour` uses two different multi-value separators: `/` and ` | `.
 - `fit`, `compareAtPrice`, `discountPercentage` and `alt` are all nullable. `alt` is null on
-  every product.
-- The ten `hits` are five distinct products in ten colourways. **Ship the list flat.**
+  every product; `compareAtPrice` and `discountPercentage` are null on **every** product in
+  this payload, not just most.
+- The sixty `hits` are twenty-one distinct products in sixty colourways. **Ship the list flat.**
 - `description` contains a `<meta>` tag mid-body and Word clipboard classes.
 
 The real payload is committed as a test resource. Mapper tests run against it, not against

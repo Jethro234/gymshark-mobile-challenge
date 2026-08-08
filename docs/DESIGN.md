@@ -33,7 +33,7 @@ sets; dark mode is not an inversion of light.
 | `border` | `#E6E6E2` | `#2A2A28` | Hairlines, unselected chips |
 | `borderStrong` | `#C8C8C2` | `#4A4A48` | Selected-adjacent chips |
 | `sale` | `#A32D2D` | `#F09595` | Discounted price only |
-| `success` | `#0F6E56` on `#E1F5EE` | `#9FE1CB` on `#0F3D31` | "Back in stock" badge |
+| `success` | `#0F6E56` on `#E1F5EE` | `#9FE1CB` on `#0F3D31` | Sustainability material chips (`GsMaterialChip`) |
 
 `sale` is the only chromatic colour in the product surface. Restraint is the point: one
 accent means the discount actually reads as an exception.
@@ -128,19 +128,44 @@ product in this payload, so the fallback is the real path, not a defensive one.
 
 ### `GsLabelBadge`
 
-Pill, `label` style, sentence case, 4dp × 11dp padding. Positioned 10dp inset from the
-image's top-left, inside the rounded corner.
+Merchandising labels only (`ARCHITECTURE.md` §8) — one per product, at most, since none of
+the sixty products in the real payload carries more than one. Pill, `label` style, sentence
+case, 4dp × 11dp padding. Positioned 10dp inset from the image's top-left, inside the
+rounded corner.
 
-| Label | Treatment |
-|---|---|
-| Going fast | `surfaceInk` fill, `onSurfaceInk` text |
-| New in | `surface` fill, `textPrimary` text |
-| Back in stock | `success` pair |
-| Sold out | `surface` fill, `textMuted` text |
-| `Unknown(raw)` | Transparent fill, 0.5dp `borderStrong`, `textSecondary` text, raw value title-cased |
+Two visual tiers, not four distinct looks — restraint over decoration, the same principle
+that keeps `sale` the surface's only chromatic colour. Meaning is carried by text; the tier
+is carried by weight:
 
-The `Unknown` treatment is deliberately the quietest: an unrecognised label from the CMS
-should be visible without competing with labels we understand.
+| Label | Tier | Treatment |
+|---|---|---|
+| Going fast | Urgency | `surfaceInk` fill, `onSurfaceInk` text |
+| Limited edition | Urgency | `surfaceInk` fill, `onSurfaceInk` text |
+| New | Informational | `surface` fill, `textPrimary` text |
+| Popular | Informational | `surface` fill, `textPrimary` text |
+| `Unknown(raw)` | — | Transparent fill, 0.5dp `borderStrong`, `textSecondary` text, raw value title-cased |
+
+The `Unknown` treatment is deliberately the quietest of all three: an unrecognised label
+from the CMS should be visible without competing with labels we understand, and stay
+visually distinct from both known tiers rather than borrowing either one's weight.
+
+`Back in stock` and `Sold out` were part of an earlier, invented label vocabulary and do not
+appear in the real payload; there is no treatment for them.
+
+### `GsMaterialChip`
+
+Sustainability labels (`recycled-nylon`, `recycled-polyester`) — genuine material-provenance
+data, not urgency or novelty, so it does not compete for the image badge slot. Rendered as
+one chip per sustainability label in a row on the detail screen, immediately before the
+description (see §5). Pill, `label` style, sentence case, `success` fill/text pair — green
+reading as the conventional retail signal for sustainable material, and a token pair already
+contrast-verified with nothing else to use it now that `success`'s original "Back in stock"
+badge doesn't exist in the real label vocabulary.
+
+A product can show zero, one or two material chips independently of whether it also shows a
+merchandising badge — the one product carrying `new` plus both recycled labels shows the
+`New` badge on its image and both material chips on its detail screen, with no stacking,
+overflow or "+2" affordance anywhere.
 
 ### `GsSizeChip`
 
@@ -203,7 +228,8 @@ supported and **never blanks the list** — `isRefreshing` lives inside `Content
 
 Back → hero image 4:5 with badge → 10dp → thumbnail strip (selected thumbnail carries a
 1.5dp `textPrimary` outline) → 18dp → title → colourway · type → price → `SIZE` eyebrow →
-size chips → hairline → sanitised description. No bottom bar, no CTA.
+size chips → hairline → material chips (if any) → sanitised description. No bottom bar, no
+CTA.
 
 The description is the visible proof of the HTML work: `<strong>RUN WITH IT</strong>`
 renders as a heading, and the `<br>`-delimited run renders as a real bullet list. The README

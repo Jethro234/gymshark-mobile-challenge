@@ -26,19 +26,17 @@ demonstrated with measurement data rather than asserted.
 
 ---
 
-## 1a. Benchmark harness — read this before the numbers
+## 1a. Dataset — no synthetic harness
 
-The payload contains **10 products**. In a two-column grid that is five rows, roughly two
-and a half screens — **not enough content to fling**. Frame timing measured over that would
-be noise rather than evidence.
+The real payload contains **60 products**: thirty rows in a two-column grid, a genuine
+sustained scroll. An earlier version of this document planned a `benchmark` build variant
+that repeated the fixtures to ~500 items, on the assumption that the payload held only ten
+products (five rows — not enough to fling). That assumption was wrong; the multiplication
+step is unnecessary and was dropped.
 
-Scroll benchmarks therefore run against a `benchmark` build variant that repeats the
-committed fixtures to ~500 items, giving a sustained fling to measure.
-
-**This is a measurement harness, not production behaviour.** The shipped app loads 10
-products. Startup metrics and the Baseline Profile comparison are unaffected and are honest
-figures for the real application; only the scroll figures use the enlarged dataset, and they
-are labelled as such in every table below.
+Every figure in this document, including the scroll numbers, is measured against the real
+shipped dataset. There is no separate harness variant and no "measurement harness, not
+production behaviour" caveat to attach to any table below.
 
 ---
 

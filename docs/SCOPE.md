@@ -34,7 +34,7 @@ Removed from scope now, not abandoned halfway. Each is one README line under "ne
 | Cut | Why |
 |---|---|
 | **Adaptive `ListDetailPaneScaffold`** | Genuinely valuable, genuinely 3–4 hours with its goldens and device checks. First thing to go on a 20-hour budget. |
-| **Colourway grouping** | Ten hits are five products in ten colours. Shipping flat is what Algolia returns and is defensible; grouping is a new product model plus swatch state plus tests. **One README line noting it was spotted** converts an apparent oversight into visible judgement at zero cost. |
+| **Colourway grouping** | Sixty hits are twenty-one products in sixty colours. Shipping flat is what Algolia returns and is defensible; grouping is a new product model plus swatch state plus tests. **One README line noting it was spotted** converts an apparent oversight into visible judgement at zero cost. |
 | **Robolectric UI test layer** | Paparazzi covers rendering; two instrumented tests cover navigation. The middle layer is the affordable loss. |
 | **Perfetto investigation write-up** | Requires finding a real jank source to fix. Keep the Baseline Profile before/after numbers, drop the narrative. |
 | **Eight modules → six** | Merge `:core:network` into `:core:data`, and `:feature:productlist` + `:feature:productdetail` into `:feature:products`. The boundary argument survives intact; four fewer build files do not need writing. |
@@ -80,24 +80,24 @@ out. Discovering on day 3 that it's harder than expected is the failure mode.
 | 11 | Detail ViewModel, `SavedStateHandle`, cache-miss refetch | 1.5 |
 | 12 | Detail screen incl. sanitised description rendering | 1.5 |
 | 13 | Navigation 3 wiring, type-safe routes | 0.5 |
-| 14 | Baseline Profile + Macrobenchmark on repeated dataset (§4) | 1.0 |
+| 14 | Baseline Profile + Macrobenchmark on the real dataset (§4) | 1.0 |
 | 15 | CI workflow, detekt/ktlint, README screenshots from goldens, final pass | 1.5 |
 
 ---
 
-## 4. Benchmark harness
+## 4. Benchmark dataset
 
-Ten products in a two-column grid is five rows — about two and a half screens. **There is
-not enough content to fling**, so `FrameTimingMetric` on the real dataset would produce
-noise, not evidence.
+**No synthetic harness needed.** The original plan assumed ten products — five rows in a
+two-column grid, not enough to fling — and built a `benchmark` build variant that repeated
+the committed fixtures to ~500 items so `FrameTimingMetric` would have something real to
+measure. The real payload has sixty products: thirty rows, a genuine scroll. `PERFORMANCE.md`
+measures the shipped dataset directly, with no separate variant, no dataset-multiplication
+step, and no "measurement harness, not production behaviour" caveat to carry — the number
+published is honest for the app as built. This also removes the roughly one hour task 14
+would otherwise have spent wiring the variant.
 
-A `benchmark` build variant repeats the committed fixtures to ~500 items so there is a real
-scroll to measure. This is a **measurement harness, not production behaviour**, and
-`PERFORMANCE.md` says so directly. Publishing P95 figures from a four-row list would be
-worse than publishing none.
-
-Startup metrics and the Baseline Profile comparison are unaffected — those are honest on the
-real app.
+Startup metrics and the Baseline Profile comparison were always honest on the real app and
+are unaffected either way.
 
 ---
 
@@ -133,9 +133,9 @@ suite, or the README. Those are the graded items.
 Deferred work, stated as choices with reasons — not a list of things that didn't get done:
 
 - Adaptive two-pane layout for tablets and foldables (Nav 3 makes this cheap; omitted for time).
-- Colourway grouping: the ten hits are five products in ten colours, and `handle` encodes it.
-  Shipped flat because that is what the search endpoint returns; grouping would mean
-  inventing a product model the API doesn't express.
+- Colourway grouping: the sixty hits are twenty-one products in sixty colours, and `handle`
+  encodes it. Shipped flat because that is what the search endpoint returns; grouping would
+  mean inventing a product model the API doesn't express.
 - Disk cache for offline first launch.
 - Field performance monitoring — Play Vitals plus RUM attribution — which is what this
   tooling is actually for at production scale.
