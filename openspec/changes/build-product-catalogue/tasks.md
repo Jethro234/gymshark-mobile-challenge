@@ -9,13 +9,13 @@ no `!!`/`lateinit`/`TODO`, one Conventional Commit scoped by module.
 
 ## 1. Prerequisite and foundation (day 1, ~2.25h)
 
-- [ ] 1.1 Fetch `https://cdn.develop.gymshark.com/training/mock-product-responses/algolia-example-payload.json` and commit it verbatim to `core/testing/src/main/resources/algolia-example-payload.json` — no trimming, reformatting or tidying. Blocks groups 2, 3 and 4
-- [ ] 1.2 Initialise the Gradle project with `gradle/libs.versions.toml` containing only the dependencies approved in `AGENTS.md` §4b
-- [ ] 1.3 Verify the pinned Compose BOM resolves `ui-text` to 1.9 or later, and record the resolved version. If it does not, stop — this is the bullet-rendering floor
-- [ ] 1.4 Verify the published `androidx.navigation3` and `lifecycle-viewmodel-navigation3` artifacts and API names match `docs/ARCHITECTURE.md` §11 before relying on them on day 3
-- [ ] 1.5 Add the `build-logic` included build with the five convention plugins from `docs/CONVENTIONS.md` §2. Timebox 2h; fallback is plain build files across six modules
-- [ ] 1.6 Create the six modules — `:app`, `:core:model`, `:core:data`, `:core:designsystem`, `:core:testing`, `:feature:products` — with `:core:model` as a pure JVM module and explicit API mode on `:core:*`
-- [ ] 1.7 Configure ktlint, detekt and Android Lint to fail the build, with no baseline file, and KSP for annotation processing
+- [x] 1.1 Fetch `https://cdn.develop.gymshark.com/training/mock-product-responses/algolia-example-payload.json` and commit it verbatim to `core/testing/src/main/resources/algolia-example-payload.json` — no trimming, reformatting or tidying. Blocks groups 2, 3 and 4
+- [x] 1.2 Initialise the Gradle project with `gradle/libs.versions.toml` containing only the dependencies approved in `AGENTS.md` §4b
+- [x] 1.3 Verify the pinned Compose BOM resolves `ui-text` to 1.9 or later, and record the resolved version. If it does not, stop — this is the bullet-rendering floor
+- [x] 1.4 Verify the published `androidx.navigation3` and `lifecycle-viewmodel-navigation3` artifacts and API names match `docs/ARCHITECTURE.md` §11 before relying on them on day 3
+- [x] 1.5 Add the `build-logic` included build with the five convention plugins from `docs/CONVENTIONS.md` §2. Timebox 2h; fallback is plain build files across six modules
+- [x] 1.6 Create the six modules — `:app`, `:core:model`, `:core:data`, `:core:designsystem`, `:core:testing`, `:feature:products` — with `:core:model` as a pure JVM module and explicit API mode on `:core:*`
+- [x] 1.7 Configure ktlint, detekt and Android Lint to fail the build, with no baseline file, and KSP for annotation processing
 
 ## 2. Domain model (day 1, ~1.5h)
 

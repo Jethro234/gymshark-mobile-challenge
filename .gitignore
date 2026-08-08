@@ -3,3 +3,27 @@
 
 # macOS
 .DS_Store
+
+# Android / Gradle
+*.iml
+.gradle/
+local.properties
+build/
+captures/
+.cxx/
+.externalNativeBuild/
+
+# Machine-local SDK/module path — regenerate with `sync project with gradle files`
+.idea/*
+!.idea/codeStyles/
+!.idea/codeStyles/**
+
+# Macrobenchmark output (docs/CONVENTIONS.md §1) — Perfetto traces are
+# committed deliberately when curated as evidence, not as raw build output.
+outputs/connected_android_test_additional_output/
+*.perfetto-trace
+!docs/traces/*.perfetto-trace
+
+# Paparazzi/Compose compiler reports — generated, not evidence
+build/reports/paparazzi/
+
