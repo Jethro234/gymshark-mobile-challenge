@@ -5,3 +5,9 @@ root = true
 # behave like a declarative type, not a verb. ktlint's function-naming rule
 # has first-class support for this exact exemption.
 ktlint_function_naming_ignore_when_annotated_with = Composable
+
+# Without this, ktlint's line-wrapping rules (e.g. function-signature) have no
+# length to wrap against and keep re-collapsing lines detekt's MaxLineLength
+# (default 120) then re-flags — the two tools fighting over the same line.
+# Matching detekt's default here is what makes a wrapped line stay wrapped.
+max_line_length = 120
