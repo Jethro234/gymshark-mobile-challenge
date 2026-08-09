@@ -170,13 +170,15 @@ Macrobenchmark on a physical Pixel 9 Pro.
 
 | Product grid scroll | No profile | Baseline Profile |
 |---|---|---|
-| `frameOverrunMs` P95 | -8.55 ms | -9.15 ms |
-| Dropped frames (overrun > 0) | 1 / 2429 (0.04%) | 3 / 2416 (0.12%) |
+| `frameOverrunMs` P95 | -8.59 ms | -8.86 ms |
+| Dropped frames (overrun > 0) | 3 / 2348 (0.13%) | 3 / 2391 (0.13%) |
 
 Every percentile is negative in both modes — on this device, the real 60-product grid
 scroll never approaches its frame deadline, with or without the profile. Startup did
-improve measurably: median `timeToInitialDisplayMs` went from 175.04 ms to 161.28 ms
-(-7.9%) with the profile applied.
+improve measurably: median `timeToInitialDisplayMs` went from 173.08 ms to 159.24 ms
+(-8.0%), and median `timeToFullDisplayMs` — the point the product grid actually
+renders, not just the loading spinner's first frame — from 445.19 ms to 422.43 ms
+(-5.1%), both with the profile applied.
 
 Full method, the measure → diagnose → fix → re-measure write-up, and the committed Perfetto
 traces are in [PERFORMANCE.md](docs/PERFORMANCE.md).

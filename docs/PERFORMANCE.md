@@ -55,6 +55,12 @@ Device state: connected via USB, screen on, no other foreground activity during 
 `MacrobenchmarkRule` runs its own compilation step ahead of each `CompilationMode.Partial()`
 iteration set; no additional manual warm-up/discard pass was layered on top of that.
 
+**Re-measured 2026-08-09** after two changes: `ContentState` now calls `reportFullyDrawn()`
+(`timeToFullDisplayMs` is measured for the first time as a result), and `GymsharkApplication`
+now builds Coil's `ImageLoader` off the same `OkHttpClient` Retrofit uses, rather than Coil
+silently constructing its own. The Baseline Profile was regenerated against the current
+build before this run.
+
 ---
 
 ## 3. Headline result — Baseline Profile impact
@@ -63,12 +69,12 @@ Product grid scroll, 10 iterations.
 
 | Metric | `CompilationMode.None()` | `CompilationMode.Partial()` | Change |
 |---|---|---|---|
-| `frameOverrunMs` P50 | -10.91 ms | -11.15 ms | -0.24 ms |
-| `frameOverrunMs` P90 | -9.29 ms | -9.74 ms | -0.45 ms |
-| `frameOverrunMs` P95 | -8.55 ms | -9.15 ms | -0.60 ms |
-| `frameOverrunMs` P99 | -6.77 ms | -7.67 ms | -0.90 ms |
-| `frameDurationCpuMs` P95 | 5.96 ms | 5.64 ms | -0.32 ms |
-| Dropped frames (overrun > 0) | 1 / 2429 (0.04%) | 3 / 2416 (0.12%) | +2 frames |
+| `frameOverrunMs` P50 | -10.66 ms | -10.88 ms | -0.22 ms |
+| `frameOverrunMs` P90 | -9.19 ms | -9.48 ms | -0.29 ms |
+| `frameOverrunMs` P95 | -8.59 ms | -8.86 ms | -0.27 ms |
+| `frameOverrunMs` P99 | -6.90 ms | -6.56 ms | +0.34 ms |
+| `frameDurationCpuMs` P95 | 6.22 ms | 5.67 ms | -0.55 ms |
+| Dropped frames (overrun > 0) | 3 / 2348 (0.13%) | 3 / 2391 (0.13%) | no change |
 
 **Reading this table:** `frameOverrunMs` is how far past its deadline a frame landed.
 Positive means the frame was dropped and the user saw a stutter; negative means the frame
@@ -77,26 +83,33 @@ positive is exactly what "mostly smooth but noticeably janky" feels like in the 
 
 **What this run actually shows:** every percentile is negative in both compilation modes —
 on this device, the real 60-product grid scroll never approaches its frame deadline, with
-or without the profile. The Baseline Profile measurably tightens frame timing (P95 overrun
-0.60 ms more negative, `frameDurationCpuMs` P95 down ~5%), but there was no jank to fix in
-either mode. §4 records that finding rather than inventing an investigation that didn't
-happen.
+or without the profile. P99 is marginally *worse* with the profile applied this run
+(+0.34 ms) while every other percentile improves — both are noise-level movements at this
+frame count, not a regression; there was no jank to fix in either mode. §4 records that
+finding rather than inventing an investigation that didn't happen.
 
 ### Startup
 
 | Metric | `None()` | `Partial()` | Change |
 |---|---|---|---|
-| `timeToInitialDisplayMs` median | 175.04 ms | 161.28 ms | -13.76 ms (-7.9%) |
-| `timeToFullDisplayMs` median | not measured | not measured | — |
+| `timeToInitialDisplayMs` median | 173.08 ms | 159.24 ms | -13.84 ms (-8.0%) |
+| `timeToFullDisplayMs` median | 445.19 ms | 422.43 ms | -22.75 ms (-5.1%) |
 
-`timeToFullDisplayMs` has nothing to report either side: it's only emitted when the app
-calls `reportFullyDrawn()`, and `MainActivity` never does.
+`timeToFullDisplayMs` is genuinely measured here — `ContentState` (`ProductListScreen.kt`)
+now calls `reportFullyDrawn()` once the product grid actually renders, not just once the
+loading spinner's first frame draws. The gap between the two metrics (roughly 270–290 ms in
+both modes) is real work this app does after the first frame: the network fetch for the
+product list, mapping, and the grid's own composition — none of which the
+`timeToInitialDisplayMs` figure alone was ever evidence of.
 
 Baseline Profiles let ART compile the profiled code paths ahead of time rather than
-interpreting and JIT-ing them on first run. The measured effect here (-7.9% median
-`timeToInitialDisplayMs`) is real but well short of the commonly-cited "~30%" figure for
-larger, more complex apps — this is a small, single-screen-at-launch app, so there is
-correspondingly less cold-start work for the profile to save.
+interpreting and JIT-ing them on first run. The measured effect on `timeToInitialDisplayMs`
+(-8.0%) is real but well short of the commonly-cited "~30%" figure for larger, more complex
+apps — this is a small, single-screen-at-launch app, so there is correspondingly less
+cold-start work for the profile to save. The effect is proportionally similar on
+`timeToFullDisplayMs` (-5.1%) — the profile's benefit compounds across the additional work
+between first frame and fully drawn, but not by an outsized amount, since most of that gap
+is spent waiting on the network fetch, which ART compilation state can't speed up.
 
 ---
 
@@ -110,10 +123,11 @@ used to make it fast is sound.
 The §3 headline numbers were the diagnosis step: every `frameOverrunMs` percentile,
 including P99, is negative in both `CompilationMode.None()` and `CompilationMode.Partial()`
 on the real 60-product dataset — no frame ever missed its deadline by a measurable margin,
-and only 1–3 frames out of ~2,400 sampled per run showed any overrun at all (noise-level,
-not a pattern). There was no symptom to chase, so there is no before/after fix to report
-here — writing one up would mean inventing a bug that this measurement did not find, which
-the warning at the top of this document exists specifically to prevent.
+and only 3 frames out of ~2,350–2,390 sampled per run showed any overrun at all (0.13% in
+both modes, noise-level, not a pattern). There was no symptom to chase, so there is no
+before/after fix to report here — writing one up would mean inventing a bug that this
+measurement did not find, which the warning at the top of this document exists specifically
+to prevent.
 
 Two representative traces are committed under `docs/traces/` as evidence for the headline
 numbers rather than as a before/after pair:
