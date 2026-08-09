@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -109,7 +110,7 @@ private fun ContentState(
             contentPadding = WindowInsets.safeDrawing.add(screenGutterInsets).asPaddingValues(),
             horizontalArrangement = Arrangement.spacedBy(spacing.gridGutter),
             verticalArrangement = Arrangement.spacedBy(spacing.gridGutter),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag(PRODUCT_GRID_TEST_TAG),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }, contentType = "header") {
                 ProductListHeader(title = state.screenTitle, countLabel = state.countLabel)
@@ -225,3 +226,6 @@ private fun ErrorCause.toMessageRes(): Int =
     }
 
 private const val GRID_COLUMN_COUNT = 2
+
+/** Exposed so instrumented tests can scroll the grid deterministically via `performScrollToIndex`. */
+const val PRODUCT_GRID_TEST_TAG: String = "productGrid"
