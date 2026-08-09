@@ -444,11 +444,6 @@ can honestly verify:
 Compose's testing API rather than raw Espresso, since the UI is entirely Compose. JUnit 4,
 per §9.0.
 
-- List renders, scrolls, and click → detail navigation with the correct product
-- System back returns to the list with scroll position preserved
-- Error state → Retry → Content
-- Semantics / content descriptions present on images and badges (talkback-testable)
-
 ### 9.4 Proving robustness the endpoint can't
 
 - **The MockWebServer suite above.**

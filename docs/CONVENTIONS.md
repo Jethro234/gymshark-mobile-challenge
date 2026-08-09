@@ -38,9 +38,7 @@ feat(designsystem): add GsLabelBadge including unknown treatment
 feat(products): add ProductListViewModel and UiState
 test(products): cover loading, content, empty and error transitions
 feat(products): add product grid screen
-test(products): add Paparazzi goldens for tier 1 states
 feat(products): add detail screen with sanitised description and bullet list
-test(products): pin bullet rendering with a Paparazzi golden
 feat(products): restore selected size across process death
 feat(products): handle refetch returning no matching product id
 feat(app): wire Navigation 3 with type-safe routes
@@ -68,8 +66,10 @@ Scopes match the six-module structure: `model` · `data` · `designsystem` · `t
 ### `.gitignore`
 
 Standard Android ignores, plus `local.properties`, `.idea/` except code style files, and
-Macrobenchmark output. **Paparazzi goldens are committed** — they are the test expectations,
-not build output.
+most Macrobenchmark output. **The generated Baseline Profile and two representative Perfetto
+traces are committed deliberately** (`app/src/release/generated/baselineProfiles/`,
+`docs/traces/`) — they are evidence, not build output. There is no snapshot-testing layer
+(§2), so no goldens directory exists to reason about here.
 
 ---
 
@@ -78,12 +78,11 @@ not build output.
 ### Version catalog
 
 All dependencies and versions in `gradle/libs.versions.toml`. No hardcoded version strings
-in any module. Bundles for things that always travel together (`compose`, `testing`,
-`paparazzi`).
+in any module. Bundles for things that always travel together (`compose`, `testing`).
 
 ### Convention plugins
 
-Eight modules with hand-maintained build files is duplication waiting to drift. A
+Seven modules with hand-maintained build files is duplication waiting to drift. A
 `build-logic` included build supplies:
 
 | Plugin | Applies to |
@@ -92,7 +91,11 @@ Eight modules with hand-maintained build files is duplication waiting to drift. 
 | `gymshark.android.library.compose` | Compose compiler, BOM, preview tooling |
 | `gymshark.android.feature` | The above plus Hilt, ViewModel, navigation |
 | `gymshark.jvm.library` | Pure Kotlin modules (`:core:model`) |
-| `gymshark.android.test` | Paparazzi, Robolectric, fixture wiring |
+| `gymshark.android.application` | `:app` only — Hilt root, KSP, NavDisplay wiring |
+| `gymshark.android.macrobenchmark` | `:macrobenchmark` only — `com.android.test`, targets `:app` |
+
+`:core:testing` applies plain `gymshark.android.library` — it holds fixtures and fakes, not
+a distinct plugin's worth of configuration.
 
 Result: a feature module's build file is about six lines. That reduction *is* the argument
 for the structure.
@@ -161,13 +164,18 @@ Run in that order, all failing the build:
 
 ## 5. What CI runs
 
-A single GitHub Actions workflow on push and pull request:
+A single GitHub Actions workflow (`.github/workflows/ci.yml`) on push and pull request:
 
 ```
-ktlint → detekt → lint → unit tests (JVM) → Paparazzi verify → Robolectric → assembleRelease
+ktlint → detekt → lint → unit tests (JVM) → assembleRelease
 ```
 
-Fast, free, reproducible by anyone who clones the repository, and no secrets required.
+There is no snapshot-testing or Robolectric step — neither layer exists in this project
+(§2 above; the reasoning is in `design.md` §8 of the `build-product-catalogue` change).
+
+Fast, free, reproducible by anyone who clones the repository, and no secrets required: the
+release build is signed with the debug key (see `app/build.gradle.kts`), specifically so
+this pipeline never needs a keystore.
 
 **Macrobenchmark is deliberately absent** — GitHub Actions has no physical devices and
 emulator figures are too noisy to gate on. Performance numbers come from local runs on real

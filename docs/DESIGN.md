@@ -97,8 +97,10 @@ tokens) and breaks languages without case. Product titles, colours and button la
 sentence case.
 
 **All sizes are `sp` and scale with user font settings.** No `dp` text anywhere. Cards are
-intrinsically sized — no fixed heights — so a 2.0 font scale reflows rather than clips.
-There is a Paparazzi golden for this.
+intrinsically sized — no fixed heights — so a 2.0 font scale reflows rather than clips. This
+is not independently verified — the snapshot layer that would have pinned it is absent, not
+reduced (see §8 below and `design.md` §8 of the `build-product-catalogue` change) — so the
+claim rests on the layout never fixing a height, not on a recorded check.
 
 ---
 
@@ -280,53 +282,53 @@ that costs more than the effect is worth here.
 ## 7. Accessibility
 
 - Every interactive target ≥ 48dp, including size chips and the back affordance.
-- All text in `sp`; layouts verified at font scale 2.0 (Paparazzi golden).
+- All text in `sp`; layouts left intrinsically sized so a 2.0 font scale reflows. Not
+  independently verified — see §7's note on the missing snapshot layer above.
 - Images carry a real `contentDescription`; decorative elements are explicitly cleared.
 - Badges expose their meaning as text, not colour alone.
 - Out-of-stock sizes convey state via `stateDescription`, not strikethrough alone.
 - Touch order and semantic order match reading order.
 - **RTL supported.** All padding and alignment use `start`/`end`, never `left`/`right`;
   directional icons (the detail screen back arrow) use `AutoMirrored` variants. Verified
-  with a mirrored Paparazzi golden and `adb shell settings put global force_rtl 1` on
-  device. The cost is discipline rather than work — the golden is the only added artefact,
-  and it catches the hardcoded-`left` mistake permanently.
+  with a one-off manual on-device check — `adb shell settings put global force_rtl 1`
+  (needs a full `adb reboot` to actually propagate) — not a golden, since the snapshot
+  layer doesn't exist in this project. The check found a real bug: `android:supportsRtl`
+  was missing from `AndroidManifest.xml` entirely, so the app silently rendered LTR-only
+  despite every modifier already correctly using `start`/`end`. Fixed, then reverified —
+  full mirroring confirmed on both screens including the `AutoMirrored` back icon.
 - Verified with a TalkBack pass on device, documented in the README.
 
 ---
 
-## 8. Paparazzi state matrix
+## 8. No snapshot layer — what replaced it
 
-Every cell below is a committed golden image, run in CI.
+This section originally planned a Paparazzi golden matrix (`ProductListScreen`'s seven
+states, `GsProductCard`'s seven variants, `GsLabelBadge`'s five treatments,
+`ProductDetailScreen`'s four states, `GsSizeChip`'s three states, each in light/dark, the
+card set additionally at font scale 2.0, `ProductListScreen` once more in RTL — roughly 60
+goldens against a 1.5h budget, already earmarked for a tiered reduction before hour 18).
 
-| Component | Variants |
-|---|---|
-| `ProductListScreen` | Loading · Content · Empty · Error(NoConnection) · Error(Server) · Error(Malformed) · Refreshing |
-| `GsProductCard` | Default · Going fast · Unknown label · On sale · Image error · Long title · Long colourway |
-| `GsLabelBadge` | All five treatments |
-| `ProductDetailScreen` | Content · Loading · Error · No compareAtPrice |
-| `GsSizeChip` | Selected · Available · Out of stock |
+**None of it was built.** Paparazzi's Gradle plugin is incompatible with the AGP version
+Hilt's Gradle plugin (2.60.1) hard-requires; Hilt is used throughout the app while Paparazzi
+is one test layer, so the pre-authorised fallback in `SCOPE.md` §6 applies — the layer is
+dropped, not reduced. Full reasoning: `design.md` §8 of the `build-product-catalogue`
+openspec change. Concretely:
 
-Each runs in **light and dark**, the card set additionally at **font scale 2.0**, and
-`ProductListScreen` once more in **RTL**.
-
-### Budget reality — read before recording goldens
-
-The matrix above × light/dark × font scale × RTL is roughly **60 goldens**, against 1.5h in
-`SCOPE.md` task 10. That does not fit. **Pre-committed reduction, applied from the start
-rather than discovered at hour 18:**
-
-**Tier 1 — always record (~16 goldens):**
-
-- `ProductListScreen`: Loading · Content · Empty · Error(NoConnection), light + dark
-- `GsProductCard`: Going fast · Unknown label · On sale · Image error, light only
-- `ProductDetailScreen`: Content, light + dark — **this is the bullet-rendering proof**
-- `GsProductCard` at font scale 2.0, light only
-- `ProductListScreen` in RTL, light only
-
-**Tier 2 — only if time remains:** remaining `ErrorCause` variants, remaining label
-treatments, long title/colourway, size chip states, detail Loading and Error.
-
-Tier 1 covers every graded item. Tier 2 is coverage, not evidence.
+- **The two states a golden would have proved — bullet rendering and RTL mirroring — are
+  one-off manual on-device checks instead**, performed before their respective screens were
+  considered complete. Both are recorded above (§7) and in `ARCHITECTURE.md` §9.3. Both
+  checks found real bugs a golden would also have caught: the aspect-ratio hardcode
+  (`GsProductCard` originally used a fixed 3:4 ratio instead of the payload's own
+  `width`/`height`, contradicting the `product-imagery` spec) and the missing
+  `android:supportsRtl` manifest flag.
+- **The image error state's visibility is unaffected** — it was always proved by a fixture
+  with a dead URL, visible on first launch, not by a golden.
+- **Everything else this matrix would have covered — light/dark theming, label badge
+  treatments, font-scale reflow beyond the manual RTL/bullet checks, size chip states — has
+  no remaining automated or manual coverage in this project.** The unit suite covers the
+  *behaviour* behind each state (which `UiState` a given input produces, which label maps to
+  which treatment); it does not verify what any of it looks like on screen. That gap is
+  named here rather than left for a reviewer to discover.
 
 ---
 
