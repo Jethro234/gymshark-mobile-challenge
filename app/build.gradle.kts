@@ -5,6 +5,12 @@ plugins {
 
 android {
     namespace = "com.gymshark.catalogue"
+
+    defaultConfig {
+        // Hilt needs its own instrumentation runner so androidTest runs against
+        // HiltTestApplication instead of the real GymsharkApplication.
+        testInstrumentationRunner = "com.gymshark.catalogue.CustomTestRunner"
+    }
 }
 
 dependencies {
@@ -15,4 +21,9 @@ dependencies {
 
     implementation(libs.okhttp.core)
     implementation(libs.kotlinx.coroutines.core)
+
+    androidTestImplementation(project(":core:testing"))
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.androidx.test.runner)
+    kspAndroidTest(libs.hilt.compiler)
 }
