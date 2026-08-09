@@ -26,6 +26,10 @@ dependencies {
     add("implementation", libs.findLibrary("compose-ui-text").get())
     add("implementation", libs.findLibrary("compose-foundation").get())
     add("implementation", libs.findLibrary("compose-material3").get())
+    // The small, official icon set (~20 icons material3 itself needs internally) — covers
+    // the AutoMirrored back arrow the design docs require, without pulling in
+    // material-icons-extended for one icon.
+    add("implementation", libs.findLibrary("compose-material-icons-core").get())
     add("implementation", libs.findLibrary("compose-ui-tooling-preview").get())
     add("debugImplementation", libs.findLibrary("compose-ui-tooling").get())
     add("debugImplementation", libs.findLibrary("compose-ui-test-manifest").get())
