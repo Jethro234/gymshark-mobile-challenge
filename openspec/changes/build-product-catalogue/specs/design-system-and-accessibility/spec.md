@@ -46,10 +46,15 @@ inverting the light theme, and dynamic colour MUST NOT be applied.
 
 ### Requirement: Contrast is verified automatically, before the tokens are used
 
-Every foreground and background token pairing SHALL meet WCAG AA: 4.5:1 for normal text, and
-3:1 only for large text — at or above 18pt (roughly 24sp), or 14pt bold — and for user
-interface boundaries. Compliance SHALL be asserted by an automated test over the token pairs,
-not by inspection.
+Every foreground-text-on-background token pairing actually used together SHALL meet WCAG AA:
+4.5:1 for normal text, 3:1 only for large text — at or above 18pt (roughly 24sp), or 14pt
+bold. `border` and `borderStrong` are decorative separators, not indicators a user needs to
+operate the interface, so they are not required-for-function boundaries under WCAG 1.4.11
+and are exempt from any UI-boundary contrast threshold. `textDisabled` is text belonging to
+an inactive control (the out-of-stock size chip) and is exempt under WCAG 1.4.3's carve-out
+for inactive-component text; its state is instead conveyed by a `stateDescription`.
+Compliance SHALL be asserted by an automated test over the remaining token pairs, not by
+inspection.
 
 #### Scenario: Contrast test exists before tokens are consumed
 
@@ -67,6 +72,26 @@ not by inspection.
 - **WHEN** a token is used for small metadata such as the colourway
 - **THEN** it SHALL meet the 4.5:1 normal-text threshold
 - **AND** the 3:1 large-text allowance MUST NOT be applied to it
+
+#### Scenario: A token is tested against every background it actually appears on
+
+- **WHEN** a single foreground token (such as `textMuted`) is used against more than one
+  background token (such as both `background` and `surface`)
+- **THEN** each real combination SHALL be tested independently
+- **AND** passing against one background SHALL NOT be assumed to imply passing against
+  another
+
+#### Scenario: Decorative separators are exempt from boundary contrast
+
+- **WHEN** `border` or `borderStrong` is used as a hairline or card-edge separator
+- **THEN** its contrast against the surface it sits on SHALL NOT be asserted by the contrast
+  test
+
+#### Scenario: Inactive-control text is exempt, and its state is conveyed another way
+
+- **WHEN** `textDisabled` is used for an out-of-stock size chip's label
+- **THEN** its contrast SHALL NOT be asserted by the contrast test
+- **AND** the chip SHALL still expose its state via a `stateDescription` of "out of stock"
 
 #### Scenario: A regression fails the build
 

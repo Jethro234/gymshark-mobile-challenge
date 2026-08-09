@@ -28,7 +28,7 @@ sets; dark mode is not an inversion of light.
 | `onSurfaceInk` | `#FFFFFF` | `#0B0B0B` | Text on `surfaceInk` |
 | `textPrimary` | `#0B0B0B` | `#FFFFFF` | Titles, prices |
 | `textSecondary` | `#5F5F5B` | `#A5A5A2` | Body copy, description |
-| `textMuted` | `#767672` | `#8A8A84` | Colourway, metadata, eyebrow labels |
+| `textMuted` | `#656561` | `#8A8A84` | Colourway, metadata, eyebrow labels |
 | `textDisabled` | `#B4B4AE` | `#4A4A48` | Out-of-stock size chips |
 | `border` | `#E6E6E2` | `#2A2A28` | Hairlines, unselected chips |
 | `borderStrong` | `#C8C8C2` | `#4A4A48` | Selected-adjacent chips |
@@ -40,18 +40,38 @@ accent means the discount actually reads as an exception.
 
 ### Contrast
 
-Every pairing meets **WCAG AA**: 4.5:1 for normal text, 3:1 only for large text
-(≥18pt / ~24sp, or 14pt bold) and UI boundaries.
+Every text pairing meets **WCAG AA**: 4.5:1 for normal text, 3:1 only for large text
+(≥18pt / ~24sp, or 14pt bold). `border` and `borderStrong` are decorative separators —
+hairlines and card edges, not indicators a user needs to operate the interface — so they are
+not required-for-function boundaries under WCAG 1.4.11 and are exempt from the 3:1
+UI-boundary allowance that phrase would otherwise invoke. Both measure well under 3:1 against
+`background` by design: the subtlety is the point ("separation comes from whitespace and
+hairlines," §3).
 
-`textMuted` was previously `#8C8C88` / `#77776F`, which measure **3.38:1** and **4.36:1** —
-both failing. The earlier justification ("used only at 11sp+") also inverted the rule: the
-3:1 allowance is for *large* text, and 11sp is small text needing 4.5:1. `textMuted` carries
-the colourway on every card, which is product information, not decoration.
+`textMuted` was previously `#8C8C88` / `#77776F`, which measure **3.38:1** and **4.36:1** on
+`background` — both failing. The earlier justification ("used only at 11sp+") also inverted
+the rule: the 3:1 allowance is for *large* text, and 11sp is small text needing 4.5:1.
+`textMuted` carries the colourway on every card, which is product information, not
+decoration.
 
-Corrected to `#767672` (**4.56:1** on white) and `#8A8A84` (**5.67:1** on `#0B0B0B`).
+First corrected to `#767672` / `#8A8A84`, verified only against `background`. That value
+still failed against `surface` (**4.18:1** — `GsAsyncImage`'s error caption sits on a
+`surface` fill), the other real place `textMuted` is used. Corrected again to `#656561`
+(light only; the dark value already cleared both), which clears both contexts with margin:
+**5.85:1** on `background`, **5.36:1** on `surface`. Dark stays `#8A8A84` — **5.67:1** on
+`background`, **4.76:1** on `surface`.
 
-Verified by a unit test over every token pair, not by eye. **That test is written before the
-tokens are used**, so a regression here fails the build rather than shipping.
+`textDisabled` (`#B4B4AE` / `#4A4A48`) is the one text-carrying token deliberately excluded
+from the 4.5:1 assertion: on `background` it measures **2.08:1** (light) and **2.22:1**
+(dark), both well short. It is used for exactly one thing — out-of-stock size-chip labels —
+which are inactive controls, exempt under WCAG 1.4.3's carve-out for text that is part of a
+disabled component. Darkening it to pass would make it read as available, defeating the
+control's purpose; the non-visual signal is carried separately by the chip's
+`stateDescription` of "out of stock" (§4), not by this token's contrast.
+
+Verified by a unit test over every token pair actually used together, not by eye — including
+the `surface` pairing the first correction missed. **That test is written before the tokens
+are used**, so a regression here fails the build rather than shipping.
 
 ---
 
