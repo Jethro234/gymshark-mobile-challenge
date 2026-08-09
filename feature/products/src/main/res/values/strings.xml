@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="product_list_wordmark">GYMSHARK</string>
+    <string name="product_list_empty">No products to show right now.</string>
+    <string name="product_list_error_no_connection">You\'re offline. Check your connection and try again.</string>
+    <string name="product_list_error_server">We couldn\'t reach the store. Try again in a moment.</string>
+    <string name="product_list_error_generic">Something went wrong.</string>
+    <string name="product_list_retry">Retry</string>
+</resources>
