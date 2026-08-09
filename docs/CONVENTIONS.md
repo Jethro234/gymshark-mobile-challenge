@@ -50,8 +50,8 @@ perf: memoise fromHtml conversion with remember
 docs: add architecture, design and performance documentation
 ```
 
-Scopes match the six-module structure: `model` · `data` · `designsystem` · `products` ·
-`app`. There is no `network`, `productlist` or `productdetail` scope.
+Scopes match the six-module structure: `model` · `data` · `designsystem` · `testing` ·
+`products` · `app`. There is no `network`, `productlist` or `productdetail` scope.
 
 ### Rules
 

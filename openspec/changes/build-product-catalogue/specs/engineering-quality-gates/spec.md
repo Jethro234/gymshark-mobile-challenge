@@ -117,7 +117,8 @@ tests, and SHALL follow Conventional Commits scoped to the six-module structure.
 #### Scenario: Scopes match the module structure
 
 - **WHEN** a commit is scoped
-- **THEN** the scope SHALL be one of `model`, `data`, `designsystem`, `products` or `app`
+- **THEN** the scope SHALL be one of `model`, `data`, `designsystem`, `testing`, `products` or
+  `app`
 
 #### Scenario: History stays readable
 

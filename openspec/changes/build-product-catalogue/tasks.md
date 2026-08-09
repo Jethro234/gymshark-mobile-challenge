@@ -44,15 +44,15 @@ instead, called out explicitly below.
 
 ## 4. Data layer (day 1–2, ~3.25h)
 
-- [ ] 4.1 Add Algolia envelope and product DTOs with `ignoreUnknownKeys = true`, plus the Retrofit service
-- [ ] 4.2 Add the DTO → domain mapper handling null `labels`, `fit`, `compareAtPrice`, `discountPercentage` and `alt`, missing `featuredMedia`, and empty `media`
-- [ ] 4.3 Test the mapper against the committed payload — all sixty hits map, and each null and multi-value case is asserted
-- [ ] 4.4 Add `ProductRepository` with an in-memory cache, `@Singleton`-scoped, exposing `getProducts()`, `getProduct(id)` and `refresh()`, with an injected dispatcher
-- [ ] 4.5 Implement and test `refresh()` bypassing the cache, and a cache hit avoiding a second network call
-- [ ] 4.6 Add `ErrorCause` — `NoConnection`, `Server`, `Malformed`, `NotFound`, `Unknown` — and map throwables to it
-- [ ] 4.7 Add the MockWebServer suite: HTTP 500, socket timeout, malformed body, truncated body and `{"hits": []}`, each asserted to the correct typed result
-- [ ] 4.8 Add `FakeProductRepository`, `MainDispatcherRule` and the fixture builders to `:core:testing`
-- [ ] 4.9 Point one fixture product's `featuredMedia.src` at a dead path so the image error state is visible on first launch
+- [x] 4.1 Add Algolia envelope and product DTOs with `ignoreUnknownKeys = true`, plus the Retrofit service
+- [x] 4.2 Add the DTO → domain mapper handling null `labels`, `fit`, `compareAtPrice`, `discountPercentage` and `alt`, missing `featuredMedia`, and empty `media`
+- [x] 4.3 Test the mapper against the committed payload — all sixty hits map, and each null and multi-value case is asserted
+- [x] 4.4 Add `ProductRepository` with an in-memory cache, `@Singleton`-scoped, exposing `getProducts()`, `getProduct(id)` and `refresh()`, with an injected dispatcher
+- [x] 4.5 Implement and test `refresh()` bypassing the cache, and a cache hit avoiding a second network call
+- [x] 4.6 Add `ErrorCause` — `NoConnection`, `Server`, `Malformed`, `NotFound`, `Unknown` — and map throwables to it
+- [x] 4.7 Add the MockWebServer suite: HTTP 500, socket timeout, malformed body, truncated body and `{"hits": []}`, each asserted to the correct typed result
+- [x] 4.8 Add `FakeProductRepository`, `MainDispatcherRule` and the fixture builders to `:core:testing`
+- [x] 4.9 Point one fixture product's `featuredMedia.src` at a dead path so the image error state is visible on first launch
 
 ## 5. Design system (day 2, ~2h)
 
