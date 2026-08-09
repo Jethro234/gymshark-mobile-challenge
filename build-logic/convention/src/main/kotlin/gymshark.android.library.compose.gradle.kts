@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.LibraryExtension
+import com.gymshark.buildlogic.configureComposeCompilerReports
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
@@ -15,6 +16,8 @@ extensions.configure<LibraryExtension> {
         compose = true
     }
 }
+
+configureComposeCompilerReports()
 
 dependencies {
     val bom = libs.findLibrary("compose-bom").get()

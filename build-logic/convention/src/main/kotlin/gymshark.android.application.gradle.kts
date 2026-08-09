@@ -1,5 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.gymshark.buildlogic.SdkConfig
+import com.gymshark.buildlogic.configureComposeCompilerReports
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
@@ -70,6 +71,8 @@ extensions.configure<KotlinAndroidProjectExtension> {
         allWarningsAsErrors.set(true)
     }
 }
+
+configureComposeCompilerReports()
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
