@@ -95,5 +95,7 @@ class ProductTest {
             featuredMedia = null,
             media = emptyList(),
             availableSizes = emptyList(),
+            heading = null,
+            bodyHtml = "<p>Body.</p>",
         )
 }

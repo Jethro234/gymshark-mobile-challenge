@@ -29,6 +29,7 @@ public data class AlgoliaEnvelopeDto(
 public data class ProductDto(
     @SerialName("objectID") public val objectId: String,
     public val title: String,
+    public val description: String = "",
     public val colour: String,
     public val type: String? = null,
     public val fit: String? = null,

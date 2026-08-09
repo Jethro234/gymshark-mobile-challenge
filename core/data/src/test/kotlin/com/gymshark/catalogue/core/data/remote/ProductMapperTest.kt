@@ -100,6 +100,20 @@ class ProductMapperTest {
     }
 
     @Test
+    fun `description is sanitised into a heading and body during mapping`() {
+        // Cross-checks the mapper's wiring against HtmlSanitiserTest's own golden case for
+        // this exact product (speed-leggings-navy-description.html) — the wiring, not the
+        // sanitising logic itself, is what this test exists to catch a regression in.
+        val products = loadRealPayload().toDomain()
+
+        val product = products.first { it.title == "Speed Leggings" && it.colour == "Navy" }
+
+        assertEquals("RUN WITH IT", product.heading)
+        assertFalse(product.bodyHtml.contains("data-mce-fragment"))
+        assertFalse(product.bodyHtml.contains("<meta"))
+    }
+
+    @Test
     fun `price maps as major units`() {
         val products = loadRealPayload().toDomain()
 

@@ -1,5 +1,6 @@
 package com.gymshark.catalogue.core.data.remote
 
+import com.gymshark.catalogue.core.model.DefaultHtmlSanitiser
 import com.gymshark.catalogue.core.model.Money
 import com.gymshark.catalogue.core.model.Product
 import com.gymshark.catalogue.core.model.ProductMedia
@@ -9,8 +10,9 @@ import com.gymshark.catalogue.core.model.parseLabels
 
 public fun AlgoliaEnvelopeDto.toDomain(): List<Product> = hits.map(ProductDto::toDomain)
 
-public fun ProductDto.toDomain(): Product =
-    Product(
+public fun ProductDto.toDomain(): Product {
+    val sanitisedDescription = DefaultHtmlSanitiser.sanitise(description)
+    return Product(
         id = objectId,
         title = title,
         colour = normaliseColour(colour),
@@ -23,7 +25,10 @@ public fun ProductDto.toDomain(): Product =
         featuredMedia = brokenImageOverride(objectId) ?: featuredMedia?.toDomain(),
         media = media.map(MediaDto::toDomain),
         availableSizes = availableSizes.map(SizeDto::toDomain),
+        heading = sanitisedDescription.heading,
+        bodyHtml = sanitisedDescription.bodyHtml,
     )
+}
 
 public fun MediaDto.toDomain(): ProductMedia =
     ProductMedia(

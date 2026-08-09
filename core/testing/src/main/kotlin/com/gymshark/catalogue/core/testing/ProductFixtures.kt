@@ -32,6 +32,8 @@ public fun productFixture(
     featuredMedia: ProductMedia? = mediaFixture(),
     media: List<ProductMedia> = listOf(mediaFixture()),
     availableSizes: List<ProductSize> = listOf(sizeFixture()),
+    heading: String? = null,
+    bodyHtml: String = "<p>Fixture description.</p>",
 ): Product =
     Product(
         id = id,
@@ -46,6 +48,8 @@ public fun productFixture(
         featuredMedia = featuredMedia,
         media = media,
         availableSizes = availableSizes,
+        heading = heading,
+        bodyHtml = bodyHtml,
     )
 
 public fun mediaFixture(

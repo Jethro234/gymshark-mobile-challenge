@@ -18,6 +18,10 @@ public data class Product(
     public val featuredMedia: ProductMedia?,
     public val media: List<ProductMedia>,
     public val availableSizes: List<ProductSize>,
+    /** The description's leading emphasis-only paragraph, already extracted — see [HtmlSanitiser]. */
+    public val heading: String?,
+    /** The description's remaining markup, already sanitised and ready for `AnnotatedString.fromHtml`. */
+    public val bodyHtml: String,
 ) {
     /**
      * On sale only when [compareAtPrice] is present and strictly greater than [price].
