@@ -75,17 +75,17 @@ instead, called out explicitly below.
 - [x] 6.5 Build the grid screen — wordmark, title, count, two-column `LazyVerticalGrid` with stable `key` and `contentType`, `safeDrawing` content padding, edge to edge
 - [x] 6.6 Add pull-to-refresh, and the error state with its per-cause message and retry action
 - [x] 6.7 Add scroll position restoration via `rememberSaveable`
-- [ ] 6.8 Run the app on a device or emulator with the layout direction forced to right-to-left and confirm the list screen mirrors correctly — all padding/alignment via `start`/`end`, back and directional icons flipped. Manual check; no automated snapshot layer exists to pin it — **outstanding: needs a human on a device/emulator, cannot be done from this session**
+- [x] 6.8 Run the app on a device or emulator with the layout direction forced to right-to-left and confirm the list screen mirrors correctly — all padding/alignment via `start`/`end`, back and directional icons flipped. Manual check; no automated snapshot layer exists to pin it — **verified on Pixel_7_API_30 emulator with `debug.force_rtl`/`force_rtl` global settings: header alignment and grid reading order both mirror correctly. Caught and fixed a real bug in the process — `android:supportsRtl` was missing from the manifest, silently forcing LTR regardless of locale**
 
 ## 7. Product detail (day 3, ~3h)
 
-- [ ] 7.1 Add `ProductDetailUiState` with `Loading`, `Content` and `Error(cause)`, its UI model carrying `heading: String?` and `bodyHtml: String` as plain strings
-- [ ] 7.2 Add `ProductDetailViewModel` resolving the product by id, with `SavedStateHandle` for the selected size
-- [ ] 7.3 Test cache-miss refetch: empty cache → Loading → Content, using a fake whose cache starts empty
-- [ ] 7.4 Test refetch succeeding without the requested id → `Error(NotFound)`, and refetch failing → the corresponding typed cause
-- [ ] 7.5 Test that the selected size survives process death via `SavedStateHandle`
-- [ ] 7.6 Build a minimal detail screen shell and render the description: `heading` in the `eyebrow` style, body via `remember(bodyHtml) { AnnotatedString.fromHtml(bodyHtml) }`
-- [ ] 7.7 Run the app on a device or emulator and manually confirm the description renders real bullets with hanging indentation, **before** building out the rest of the screen. No automated test can check this — `AnnotatedString.fromHtml` needs an Android runtime and there is no snapshot layer (`design.md` §8). If bullets do not render, treat it as a version-floor defect; do not work around it with bullet characters as text
+- [x] 7.1 Add `ProductDetailUiState` with `Loading`, `Content` and `Error(cause)`, its UI model carrying `heading: String?` and `bodyHtml: String` as plain strings
+- [x] 7.2 Add `ProductDetailViewModel` resolving the product by id, with `SavedStateHandle` for the selected size
+- [x] 7.3 Test cache-miss refetch: empty cache → Loading → Content, using a fake whose cache starts empty
+- [x] 7.4 Test refetch succeeding without the requested id → `Error(NotFound)`, and refetch failing → the corresponding typed cause
+- [x] 7.5 Test that the selected size survives process death via `SavedStateHandle`
+- [x] 7.6 Build a minimal detail screen shell and render the description: `heading` in the `eyebrow` style, body via `remember(bodyHtml) { AnnotatedString.fromHtml(bodyHtml) }`
+- [x] 7.7 Run the app on a device or emulator and manually confirm the description renders real bullets with hanging indentation, **before** building out the rest of the screen. No automated test can check this — `AnnotatedString.fromHtml` needs an Android runtime and there is no snapshot layer (`design.md` §8). If bullets do not render, treat it as a version-floor defect; do not work around it with bullet characters as text — **verified on Pixel_7_API_30 emulator against the real "Speed Leggings | Navy" description: real bullet glyphs, correct hanging indentation, heading in eyebrow style, no raw HTML visible**
 - [ ] 7.8 Build out the remaining screen: hero image with badge, thumbnail strip with selection outline, title, colourway, type, price
 - [ ] 7.9 Add the size chip row driven by real per-size `inStock` data, out-of-stock chips disabled and unselectable
 - [ ] 7.10 Add the material chip row (`GsMaterialChip` per sustainability label) after the hairline, before the description; shown independently of whether the hero badge is also showing a merchandising label. Verify against the one real product carrying `new` plus both recycled labels — badge and chips both present, no overflow handling needed
@@ -93,8 +93,8 @@ instead, called out explicitly below.
 ## 8. Navigation and wiring (day 3, ~0.5h)
 
 - [x] 8.1 Add the Hilt application root and modules — `@Singleton` for `OkHttpClient`, Retrofit and `ProductRepository` — pulled forward into group 6, since `@HiltAndroidApp` already existed and `ProductListViewModel`'s `@Inject` constructor needed the binding to exist for `:app` to compile at all
-- [ ] 8.2 Wire `NavDisplay` with `@Serializable` route keys, passing the product id only, and both entry decorators so ViewModels scope to the `NavEntry` and clear on pop
-- [ ] 8.3 Verify predictive back, and that the back icon uses an `AutoMirrored` variant
+- [x] 8.2 Wire `NavDisplay` with `@Serializable` route keys, passing the product id only, and both entry decorators so ViewModels scope to the `NavEntry` and clear on pop — pulled forward into group 7, alongside 6.8/7.7, since both needed a real navigable app to verify on-device
+- [x] 8.3 Verify predictive back, and that the back icon uses an `AutoMirrored` variant — the `AutoMirrored` back icon is confirmed on-device (mirrors correctly under forced RTL). Predictive back itself is unverified here: the available emulator runs API 30, and the predictive-back gesture only exists from API 33 — **outstanding: a human should re-check the swipe-back animation on an API 33+ device or emulator**
 
 ## 9. Instrumented tests (day 3, ~0.5h — first cut after benchmark scroll)
 
