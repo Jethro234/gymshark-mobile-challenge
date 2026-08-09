@@ -40,8 +40,8 @@ subprojects {
     configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
         buildUponDefaultConfig = true
         allRules = false
-        // No config.setFrom(...): a committed detekt.yml with project-
-        // specific thresholds is added alongside the code it governs,
-        // not speculatively during scaffolding.
+        // Added alongside :core:designsystem (docs/CONVENTIONS.md §3), the
+        // first Compose-heavy module — not speculatively during scaffolding.
+        config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
     }
 }

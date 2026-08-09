@@ -1,0 +1,7 @@
+root = true
+
+[*.{kt,kts}]
+# @Composable functions are PascalCase by JetBrains' own convention — they
+# behave like a declarative type, not a verb. ktlint's function-naming rule
+# has first-class support for this exact exemption.
+ktlint_function_naming_ignore_when_annotated_with = Composable

@@ -1,0 +1,23 @@
+complexity:
+  LongMethod:
+    # Compose UI functions are naturally longer than the general-purpose default —
+    # a product card's layout body is one function by design, not a smell.
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    # Composables idiomatically take one parameter per piece of content plus a
+    # trailing `modifier` and callbacks; splitting them up would fight the pattern
+    # every screen in `docs/DESIGN.md` uses.
+    ignoreAnnotated: ['Composable']
+
+naming:
+  FunctionNaming:
+    # PascalCase is the required, JetBrains-endorsed naming convention for
+    # `@Composable` functions — they behave like a declarative type, not a verb.
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    # Semantic colour, spacing and shape tokens are the named thing — the hex
+    # literal or dp value inside `val textMuted = Color(0xFF656561)` is not
+    # "magic", the property name already carries the meaning.
+    ignorePropertyDeclaration: true
