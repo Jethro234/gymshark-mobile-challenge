@@ -17,12 +17,23 @@ plugins {
     alias(libs.plugins.mannodermaus.android.junit5) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ktlint) apply false
-    alias(libs.plugins.kover) apply false
     alias(libs.plugins.androidx.baselineprofile) apply false
+    // Applied for real (not apply false) — Kover is only ever used here, at the root, to
+    // aggregate coverage from the two pure-Kotlin/data modules named in ARCHITECTURE.md
+    // §9.5. It is not applied to every subproject the way ktlint/detekt are below.
+    alias(libs.plugins.kover)
 }
 
 tasks.register("clean", Delete::class) {
     delete(rootProject.layout.buildDirectory)
+}
+
+// docs/ARCHITECTURE.md §9.5 — Kover reported for :core:model and :core:data only, no
+// enforced threshold. Compose UI and DI wiring are excluded: coverage there measures
+// framework glue, not the logic this suite is trying to prove correct.
+dependencies {
+    kover(project(":core:model"))
+    kover(project(":core:data"))
 }
 
 // ktlint and detekt apply to every module uniformly (docs/CONVENTIONS.md
