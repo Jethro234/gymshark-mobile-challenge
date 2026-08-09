@@ -45,14 +45,20 @@ public fun SizeDto.toDomain(): ProductSize =
         inventoryQuantity = inventoryQuantity,
     )
 
-// The real endpoint is a static file that cannot fail and, at time of writing, every one of
-// its 353 image URLs resolves — there is no naturally broken image to demonstrate the graded
-// "handle incorrect and/or missing images" requirement against. README.md and
-// docs/ARCHITECTURE.md §9.4 record the deliberate fix: one specific, stable product's image is
-// swapped for a URL guaranteed to 404, so the composed error state is visible on first launch
-// without opening a test file. "Speed Leggings | Moonstone Blue" was picked arbitrarily; what
-// matters is that it is a fixed objectID, not a random or index-based choice that could shift
-// under a future payload update.
+// The real endpoint is a static file that cannot fail, and the payload's own image URLs
+// are Shopify CDN links outside this project's control — whether any of the 353 of them
+// currently 404 is incidental, not a stable property of the dataset. At the time this
+// override was written, none did; as of 2026-08-10, three genuinely do (Training Leggings
+// | Navy, Flex High Waisted Leggings | Charcoal Marl, Flex High Waisted Leggings | Black —
+// confirmed with a direct curl, not assumed). That is not something to build the graded
+// "handle incorrect and/or missing images" requirement on: Shopify could clean those links
+// up at any point, silently removing the only evidence of this requirement being met.
+// README.md and docs/ARCHITECTURE.md §9.4 record the deliberate fix instead: one specific,
+// stable product's image is swapped for a URL guaranteed to 404, so the composed error
+// state is visible on first launch without opening a test file, regardless of what the real
+// CDN is doing today. "Speed Leggings | Moonstone Blue" was picked arbitrarily; what matters
+// is that it is a fixed objectID, not a random or index-based choice that could shift under
+// a future payload update.
 //
 // Only `src` is swapped — width/height/alt are kept from the real record. A genuinely broken
 // image still has known dimensions in the product data (a CDN or proxy failure doesn't erase

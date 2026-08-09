@@ -138,7 +138,9 @@ an error-free experience, so failure is demonstrated deliberately:
   bodies and `{"hits": []}` — each asserted end-to-end through repository → ViewModel →
   the correct typed `UiState`.
 - **One fixture product points at a dead image URL**, so the error placeholder is visible on
-  first launch without reading a single test.
+  first launch without reading a single test — deliberate and fixed by product ID, not left
+  to chance (a few of the payload's real image URLs also happen to 404 right now, but that's
+  incidental and could change without warning; see `ProductMapper.kt`).
 - **Process death** is handled and verified: the selected size survives via `SavedStateHandle`, scroll position via `rememberSaveable`, and the detail screen refetches when the in-memory cache is gone
   rather than restoring to a blank screen.
 

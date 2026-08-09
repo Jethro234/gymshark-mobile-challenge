@@ -449,7 +449,12 @@ per §9.0.
 - **The MockWebServer suite above.**
 - **One fixture product's `featuredMedia.src` deliberately points at a dead path**, so the
   error placeholder is visible on first launch. The reviewer sees the requirement met
-  without opening a test file.
+  without opening a test file. Deliberate and fixed by objectID rather than relying on
+  chance: as of 2026-08-10 three real Shopify CDN URLs elsewhere in the payload also 404
+  (confirmed with a direct request, not assumed — see the comment above
+  `brokenImageOverride` in `ProductMapper.kt`), but that is incidental and could be fixed
+  upstream at any time without warning, which is exactly why this requirement isn't left to
+  depend on it.
 
 ### 9.5 Coverage
 
