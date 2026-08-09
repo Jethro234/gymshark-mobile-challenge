@@ -67,6 +67,7 @@ public fun GsAsyncImage(
     contentHeight: Int?,
     modifier: Modifier = Modifier,
     shape: Shape = GsTheme.shapes.card,
+    showErrorLabel: Boolean = true,
 ) {
     var state by remember(model) {
         mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty)
@@ -101,6 +102,7 @@ public fun GsAsyncImage(
         when (state) {
             is AsyncImagePainter.State.Error ->
                 GsAsyncImageErrorFallback(
+                    showLabel = showErrorLabel,
                     modifier =
                         Modifier
                             .fillMaxSize()
@@ -139,7 +141,10 @@ private fun GsAsyncImageShimmer(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun GsAsyncImageErrorFallback(modifier: Modifier = Modifier) {
+private fun GsAsyncImageErrorFallback(
+    showLabel: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier.background(GsTheme.colorScheme.surface),
         contentAlignment = Alignment.Center,
@@ -153,15 +158,19 @@ private fun GsAsyncImageErrorFallback(modifier: Modifier = Modifier) {
                     .fillMaxSize(ERROR_ICON_FRACTION)
                     .aspectRatio(1f),
         )
-        Text(
-            text = stringResource(R.string.gs_image_unavailable),
-            style = GsTheme.typography.label,
-            color = GsTheme.colorScheme.textMuted,
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 10.dp)
-                    .clearAndSetSemantics { },
-        )
+        // Too small a target (e.g. the 64dp detail-screen thumbnails) for the caption to fit
+        // without wrapping over the icon — the icon alone still reads as "no image" there.
+        if (showLabel) {
+            Text(
+                text = stringResource(R.string.gs_image_unavailable),
+                style = GsTheme.typography.label,
+                color = GsTheme.colorScheme.textMuted,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 10.dp)
+                        .clearAndSetSemantics { },
+            )
+        }
     }
 }

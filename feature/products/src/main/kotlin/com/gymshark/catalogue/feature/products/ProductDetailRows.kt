@@ -85,6 +85,7 @@ internal fun ThumbnailStrip(
                     contentWidth = item.width,
                     contentHeight = item.height,
                     shape = GsTheme.shapes.thumbnail,
+                    showErrorLabel = false,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
