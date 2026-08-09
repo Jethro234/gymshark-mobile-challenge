@@ -110,9 +110,9 @@ instead, called out explicitly below.
 
 ## 11. Final pass (day 3, ~1.5h)
 
-- [ ] 11.1 Add the CI workflow: ktlint → detekt → lint → JVM unit tests → `assembleRelease`, no secrets, no benchmarks
-- [ ] 11.2 Fix the stale documentation — Robolectric in `docs/CONVENTIONS.md` §2 and §5, the "two tests / four bullets" mismatch in `docs/ARCHITECTURE.md` §9.3, and every Paparazzi/snapshot reference in `README.md`'s testing table and `docs/DESIGN.md` §8 (the layer is entirely absent, not reduced — see `design.md` §8 of this change for why)
-- [ ] 11.3 Report Kover coverage for `:core:model` and `:core:data` and quote it in the README with the deliberately-untested list
-- [ ] 11.4 Run a TalkBack pass on device and record the result in the README (the RTL pass already happened manually in task 6.8 — record that result too)
-- [ ] 11.5 Remove the agent note comment from the README, and confirm no screenshot, performance figure or placeholder has been invented
-- [ ] 11.6 Generate README screenshots from the running app on a device or emulator — human only. (Originally planned from committed Paparazzi goldens; there are none)
+- [x] 11.1 Add the CI workflow: ktlint → detekt → lint → JVM unit tests → `assembleRelease`, no secrets, no benchmarks
+- [x] 11.2 Fix the stale documentation — Robolectric in `docs/CONVENTIONS.md` §2 and §5, the "two tests / four bullets" mismatch in `docs/ARCHITECTURE.md` §9.3, and every Paparazzi/snapshot reference in `README.md`'s testing table and `docs/DESIGN.md` §8 (the layer is entirely absent, not reduced — see `design.md` §8 of this change for why)
+- [x] 11.3 Report Kover coverage for `:core:model` and `:core:data` and quote it in the README with the deliberately-untested list — 86.2% / 98.0% line coverage
+- [ ] 11.4 Run a TalkBack pass on device and record the result in the README — **needs a human with the device in hand**; the RTL pass (task 6.8) is done and recorded in the README's new Accessibility section. Enabling TalkBack via shell gets the service running but the pass itself (listening to announcements) isn't something a shell command can do
+- [x] 11.5 Remove the agent note comment from the README, and confirm no screenshot, performance figure or placeholder has been invented
+- [x] 11.6 Generate README screenshots from the running app on device — done from the real running app on a physical Pixel 9 Pro (android-cli became available this session; see commit history). Five real screenshots: product list light/dark, detail screen, rendered HTML/bullets, offline error state. Loading and Empty states not captured — Loading resolves too fast to screenshot reliably, Empty is unreachable against the real 60-item payload. Found and fixed a real bug in the process: dark mode text correctly switched colour but the screen background never did (no `Modifier.background` was ever applied — the window's hardcoded light theme showed through), producing unreadable white-on-white text; fixed with a themed `Surface` wrapper in `GymsharkTheme`

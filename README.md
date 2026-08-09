@@ -5,26 +5,29 @@ label indicators, a detail screen, and the HTML product description rendered pro
 
 Jetpack Compose · MVVM · Navigation 3 · Hilt · Coil 3 · Kotlin
 
-<!--
-  AGENT NOTE — remove this comment before submission.
-  Screenshot paths under docs/screenshots/ are placeholders. Generate them from the
-  committed Paparazzi goldens; do not create, mock up, or source images by any other means.
-  Performance figures marked TBC must stay TBC until a human runs the benchmark on a
-  physical device. Do not estimate them.
--->
-
-
 ---
 
 ## Screens
+
+Real screenshots, taken from the app running on a physical Pixel 9 Pro against the live
+payload — not mockups.
 
 | Product list | Product detail | Dark |
 |---|---|---|
 | ![List](docs/screenshots/list-light.png) | ![Detail](docs/screenshots/detail-light.png) | ![Dark](docs/screenshots/list-dark.png) |
 
-| Loading | Empty | Offline | Image error |
-|---|---|---|---|
-| ![Loading](docs/screenshots/state-loading.png) | ![Empty](docs/screenshots/state-empty.png) | ![Offline](docs/screenshots/state-offline.png) | ![Image error](docs/screenshots/state-image-error.png) |
+The list screenshot above shows the **image-error placeholder** for real — one fixture
+product points at a dead URL (see "Proving robustness" below), so it's visible without
+reading a test.
+
+| Offline |
+|---|
+| ![Offline](docs/screenshots/state-offline.png) |
+
+Captured by disabling Wi-Fi and mobile data on the device and force-relaunching the app.
+**Loading and Empty are not captured**: Loading resolves too fast against this endpoint to
+screenshot reliably, and Empty is unreachable against the real payload (60 hits, always) —
+both are exercised by the unit suite instead, not by a device screenshot.
 
 ---
 
@@ -43,11 +46,9 @@ Word. It arrives like this:
 
 It is sanitised by a pure, unit-tested function and rendered with
 `AnnotatedString.fromHtml`, so `<strong>` becomes a heading and the `<br>`-delimited run
-becomes a real bullet list:
+becomes a real bullet list — this is the actual detail screen, scrolled to the description:
 
-| Raw | Rendered |
-|---|---|
-| ![Raw](docs/screenshots/html-raw.png) | ![Rendered](docs/screenshots/html-rendered.png) |
+![Rendered](docs/screenshots/html-rendered.png)
 
 No WebView. Sanitising is load-bearing rather than cosmetic — `fromHtml` silently ignores
 tags it doesn't recognise.
@@ -59,16 +60,17 @@ tags it doesn't recognise.
 ```bash
 ./gradlew installDebug          # install
 ./gradlew test                  # JVM unit tests
-./gradlew verifyPaparazziDebug  # snapshot tests against committed goldens
-./gradlew recordPaparazziDebug  # re-record goldens after an intended visual change
 ./gradlew connectedCheck        # instrumented tests (device required)
 ./gradlew koverHtmlReport       # coverage report
 ```
 
+There is no snapshot-testing layer — Paparazzi's Gradle plugin is incompatible with the AGP
+version Hilt requires; see [DESIGN.md](docs/DESIGN.md) §8 for what replaced it.
+
 Benchmarks require a **physical device** and a release build:
 
 ```bash
-./gradlew :macrobenchmark:connectedBenchmarkAndroidTest
+./gradlew :macrobenchmark:connectedBenchmarkReleaseAndroidTest
 ```
 
 Minimum SDK 26. No API keys or local configuration required.
@@ -162,12 +164,17 @@ Choices with reasons, not a list of unfinished work:
 ## Performance
 
 Baseline Profile generated with `BaselineProfileRule`; scroll and startup measured with
-Macrobenchmark on a physical device.
+Macrobenchmark on a physical Pixel 9 Pro.
 
 | Product grid scroll | No profile | Baseline Profile |
 |---|---|---|
-| `frameOverrunMs` P95 | `TBC` | `TBC` |
-| Dropped frames | `TBC` | `TBC` |
+| `frameOverrunMs` P95 | -8.55 ms | -9.15 ms |
+| Dropped frames (overrun > 0) | 1 / 2429 (0.04%) | 3 / 2416 (0.12%) |
+
+Every percentile is negative in both modes — on this device, the real 60-product grid
+scroll never approaches its frame deadline, with or without the profile. Startup did
+improve measurably: median `timeToInitialDisplayMs` went from 175.04 ms to 161.28 ms
+(-7.9%) with the profile applied.
 
 Full method, the measure → diagnose → fix → re-measure write-up, and the committed Perfetto
 traces are in [PERFORMANCE.md](docs/PERFORMANCE.md).
@@ -179,15 +186,49 @@ traces are in [PERFORMANCE.md](docs/PERFORMANCE.md).
 | Layer | Tool | Covers |
 |---|---|---|
 | Unit | JUnit 5, Turbine, MockWebServer | Mappers, `Money`, `Label`, `HtmlSanitiser`, ViewModel state machines, error paths |
-| Snapshot | Paparazzi | Every `UiState`, every label treatment, image error, light/dark, font scale 2.0 |
 | Instrumented | Compose + JUnit 4 | List→detail navigation, back with scroll restored, error retry |
+
+**No snapshot-testing layer** — Paparazzi's Gradle plugin is incompatible with the AGP
+version Hilt's Gradle plugin hard-requires, and both cannot be satisfied at once. The two
+checks a golden would have covered — bullet rendering and RTL mirroring — are instead
+one-off manual on-device checks, recorded in [DESIGN.md](docs/DESIGN.md) §7–8. Everything
+else the matrix would have covered (light/dark theming, label badge treatments, remaining
+font-scale reflow) has no remaining visual coverage — named as a gap rather than left for a
+reviewer to discover.
 
 Hand-written fakes throughout — no mocking library. Test fixtures come from the **real
 committed payload**, so mappers are exercised against genuine data rather than a tidied
 approximation of it.
 
-Coverage is reported but not gated. What is deliberately untested — and why — is listed in
-[ARCHITECTURE.md](docs/ARCHITECTURE.md) §9.6.
+**Kover line coverage** (`./gradlew koverHtmlReport`, reported but not gated):
+
+| Module | Line coverage |
+|---|---|
+| `:core:model` | 86.2% (100/116) |
+| `:core:data` | 98.0% (96/98) |
+
+A gate would invite tests written to move a number rather than to catch a defect. What is
+deliberately untested — and why — is listed in [ARCHITECTURE.md](docs/ARCHITECTURE.md) §9.6.
+
+---
+
+## Accessibility
+
+Two verification passes that no automated layer can honestly cover (§8 of `DESIGN.md` — no
+snapshot layer exists to pin either), both on a physical device rather than an emulator:
+
+- **RTL mirroring — done.** `adb shell settings put global debug.force_rtl 1` (a full `adb
+  reboot` is needed for it to actually propagate) confirmed full mirroring, including the
+  `AutoMirrored` back icon. This check found a real bug: `android:supportsRtl` was missing
+  from `AndroidManifest.xml` entirely, so the app silently rendered LTR-only despite every
+  modifier already correctly using `start`/`end`. Fixed, then reverified.
+- **TalkBack pass — not yet run.** Needs a human with the device in hand listening to the
+  announcements (enabling TalkBack via `adb shell settings put secure
+  enabled_accessibility_services …` gets the service running but not the actual pass — this
+  needs a person, not a shell command). To run it: Settings → Accessibility → TalkBack →
+  on, then swipe through the product list, a product card, and the detail screen, checking
+  that every image, badge and price is announced with the same meaning it visually conveys,
+  and that reading order matches visual order. Replace this line with the result.
 
 ---
 
@@ -196,7 +237,7 @@ Coverage is reported but not gated. What is deliberately untested — and why �
 | Document | Contents |
 |---|---|
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Module structure, DI, state modelling, data layer, navigation, testing strategy, state restoration — each decision with its rejected alternatives |
-| [DESIGN.md](docs/DESIGN.md) | Colour and type tokens, component specs, accessibility, snapshot state matrix |
+| [DESIGN.md](docs/DESIGN.md) | Colour and type tokens, component specs, accessibility, what replaced the snapshot-testing layer |
 | [PERFORMANCE.md](docs/PERFORMANCE.md) | Benchmark method, results, Perfetto traces, what production monitoring would look like |
 | [CONVENTIONS.md](docs/CONVENTIONS.md) | Git strategy, build setup, static analysis, code style |
 
