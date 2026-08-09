@@ -11,4 +11,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:products"))
+
+    implementation(libs.okhttp.core)
+    implementation(libs.kotlinx.coroutines.core)
 }
