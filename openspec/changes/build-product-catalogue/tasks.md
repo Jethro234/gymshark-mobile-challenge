@@ -98,8 +98,8 @@ instead, called out explicitly below.
 
 ## 9. Instrumented tests (day 3, ~0.5h — first cut after benchmark scroll)
 
-- [ ] 9.1 Test: tapping a product navigates to the correct detail screen, and system back returns to the list with scroll position preserved
-- [ ] 9.2 Test: the error state's retry action recovers to content, with `FakeProductRepository` injected via `@TestInstallIn`
+- [x] 9.1 Test: tapping a product navigates to the correct detail screen, and system back returns to the list with scroll position preserved — run for real on the Pixel_7_API_30 emulator; confirmed it fails when scroll-position persistence is broken before committing it
+- [x] 9.2 Test: the error state's retry action recovers to content, with `FakeProductRepository` injected via `@TestInstallIn` — a `TestRepositoryHolder` object backs the `@TestInstallIn` module so each test can configure the fake before `createAndroidComposeRule<MainActivity>()` launches it; `@BindValue` was tried first and rejected (Dagger duplicate-binding error, since it adds a binding rather than replacing `DataModule`'s)
 
 ## 10. Performance (day 3, ~1h)
 
