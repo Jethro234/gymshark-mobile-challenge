@@ -166,6 +166,13 @@ class ProductMapperTest {
             broken.featuredMedia!!.url.contains("deliberately-broken"),
             "Expected the fixed broken-image product to carry the deliberately broken URL",
         )
+        assertEquals(
+            1692,
+            broken.featuredMedia!!.width,
+            "Only the URL should be swapped — width/height stay real, so the grid cell " +
+                "reserves the same aspect ratio it would have if the image had loaded",
+        )
+        assertEquals(2018, broken.featuredMedia!!.height)
 
         val others = products.filterNot { it === broken }
         assertFalse(others.any { it.featuredMedia?.url?.contains("deliberately-broken") == true })

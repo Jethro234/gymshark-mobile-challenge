@@ -22,7 +22,7 @@ public fun ProductDto.toDomain(): Product {
         compareAtPrice = compareAtPrice?.let(Money::fromMajorUnits),
         discountPercentage = discountPercentage,
         labels = parseLabels(labels),
-        featuredMedia = brokenImageOverride(objectId) ?: featuredMedia?.toDomain(),
+        featuredMedia = brokenImageOverride(objectId, featuredMedia) ?: featuredMedia?.toDomain(),
         media = media.map(MediaDto::toDomain),
         availableSizes = availableSizes.map(SizeDto::toDomain),
         heading = sanitisedDescription.heading,
@@ -53,13 +53,27 @@ public fun SizeDto.toDomain(): ProductSize =
 // without opening a test file. "Speed Leggings | Moonstone Blue" was picked arbitrarily; what
 // matters is that it is a fixed objectID, not a random or index-based choice that could shift
 // under a future payload update.
+//
+// Only `src` is swapped — width/height/alt are kept from the real record. A genuinely broken
+// image still has known dimensions in the product data (a CDN or proxy failure doesn't erase
+// them); nulling them here would be a self-inflicted second failure mode, reserving the
+// portrait-fallback aspect ratio instead of the real one and leaving this one card a
+// different height from its grid siblings.
 private const val BROKEN_IMAGE_PRODUCT_ID = "6732607094883"
 private const val BROKEN_IMAGE_URL =
     "https://cdn.develop.gymshark.com/deliberately-broken-image-for-error-state-demo.jpg"
 
-private fun brokenImageOverride(objectId: String): ProductMedia? =
+private fun brokenImageOverride(
+    objectId: String,
+    realMedia: MediaDto?,
+): ProductMedia? =
     if (objectId == BROKEN_IMAGE_PRODUCT_ID) {
-        ProductMedia(url = BROKEN_IMAGE_URL, alt = null, width = null, height = null)
+        ProductMedia(
+            url = BROKEN_IMAGE_URL,
+            alt = realMedia?.alt,
+            width = realMedia?.width,
+            height = realMedia?.height,
+        )
     } else {
         null
     }
