@@ -9,4 +9,5 @@
     <string name="product_detail_back">Back</string>
     <string name="product_detail_back_to_list">Back to list</string>
     <string name="product_detail_not_found">This product is no longer available.</string>
+    <string name="product_detail_size_label">Size</string>
 </resources>
