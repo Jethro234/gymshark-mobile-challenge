@@ -12,6 +12,7 @@ public fun AlgoliaEnvelopeDto.toDomain(): List<Product> = hits.map(ProductDto::t
 
 public fun ProductDto.toDomain(): Product {
     val sanitisedDescription = DefaultHtmlSanitiser.sanitise(description)
+    val isBrokenImageProduct = objectId == BROKEN_IMAGE_PRODUCT_ID
     return Product(
         id = objectId,
         title = title,
@@ -22,17 +23,24 @@ public fun ProductDto.toDomain(): Product {
         compareAtPrice = compareAtPrice?.let(Money::fromMajorUnits),
         discountPercentage = discountPercentage,
         labels = parseLabels(labels),
-        featuredMedia = brokenImageOverride(objectId, featuredMedia) ?: featuredMedia?.toDomain(),
-        media = media.map(MediaDto::toDomain),
+        featuredMedia = featuredMedia?.toDomain(brokenImage = isBrokenImageProduct),
+        // media[0] is the same Shopify asset as featuredMedia in every real product (same
+        // id, same src) — only breaking featuredMedia would leave the detail screen's hero
+        // image (read from media[0], not featuredMedia) showing the real photo the moment a
+        // reviewer taps in, undoing the whole demonstration.
+        media =
+            media.mapIndexed { index, dto ->
+                dto.toDomain(brokenImage = isBrokenImageProduct && index == 0)
+            },
         availableSizes = availableSizes.map(SizeDto::toDomain),
         heading = sanitisedDescription.heading,
         bodyHtml = sanitisedDescription.bodyHtml,
     )
 }
 
-public fun MediaDto.toDomain(): ProductMedia =
+public fun MediaDto.toDomain(brokenImage: Boolean = false): ProductMedia =
     ProductMedia(
-        url = src,
+        url = if (brokenImage) BROKEN_IMAGE_URL else src,
         alt = alt,
         width = width,
         height = height,
@@ -60,6 +68,13 @@ public fun SizeDto.toDomain(): ProductSize =
 // is that it is a fixed objectID, not a random or index-based choice that could shift under
 // a future payload update.
 //
+// Both featuredMedia and media[0] are swapped, not just featuredMedia — in every real
+// product they're the same Shopify asset (same id, same src), and the list screen reads
+// featuredMedia while the detail screen's hero image reads media[0]. Swapping only the
+// former meant the list card showed the error placeholder but tapping into the detail
+// screen immediately showed the real photo — the same asset "un-breaking" itself on
+// navigation, which looks exactly like a caching bug even though no caching is involved.
+//
 // Only `src` is swapped — width/height/alt are kept from the real record. A genuinely broken
 // image still has known dimensions in the product data (a CDN or proxy failure doesn't erase
 // them); nulling them here would be a self-inflicted second failure mode, reserving the
@@ -68,18 +83,3 @@ public fun SizeDto.toDomain(): ProductSize =
 private const val BROKEN_IMAGE_PRODUCT_ID = "6732607094883"
 private const val BROKEN_IMAGE_URL =
     "https://cdn.develop.gymshark.com/deliberately-broken-image-for-error-state-demo.jpg"
-
-private fun brokenImageOverride(
-    objectId: String,
-    realMedia: MediaDto?,
-): ProductMedia? =
-    if (objectId == BROKEN_IMAGE_PRODUCT_ID) {
-        ProductMedia(
-            url = BROKEN_IMAGE_URL,
-            alt = realMedia?.alt,
-            width = realMedia?.width,
-            height = realMedia?.height,
-        )
-    } else {
-        null
-    }

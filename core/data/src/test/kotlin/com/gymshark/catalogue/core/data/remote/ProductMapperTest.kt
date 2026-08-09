@@ -174,6 +174,22 @@ class ProductMapperTest {
         )
         assertEquals(2018, broken.featuredMedia!!.height)
 
+        // media[0] is the same Shopify asset as featuredMedia in the real payload (the list
+        // screen reads featuredMedia, the detail screen's hero image reads media[0]) — both
+        // must carry the swap, or the error state visibly "un-breaks" itself the moment a
+        // reviewer taps from the list into the detail screen.
+        assertTrue(
+            broken.media
+                .first()
+                .url
+                .contains("deliberately-broken"),
+            "Expected media[0] — the same asset as featuredMedia — to carry the broken URL too",
+        )
+        assertTrue(
+            broken.media.drop(1).none { it.url.contains("deliberately-broken") },
+            "Only the one shared asset should be broken, not the rest of the product's gallery",
+        )
+
         val others = products.filterNot { it === broken }
         assertFalse(others.any { it.featuredMedia?.url?.contains("deliberately-broken") == true })
     }
