@@ -222,13 +222,10 @@ snapshot layer exists to pin either), both on a physical device rather than an e
   `AutoMirrored` back icon. This check found a real bug: `android:supportsRtl` was missing
   from `AndroidManifest.xml` entirely, so the app silently rendered LTR-only despite every
   modifier already correctly using `start`/`end`. Fixed, then reverified.
-- **TalkBack pass — not yet run.** Needs a human with the device in hand listening to the
-  announcements (enabling TalkBack via `adb shell settings put secure
-  enabled_accessibility_services …` gets the service running but not the actual pass — this
-  needs a person, not a shell command). To run it: Settings → Accessibility → TalkBack →
-  on, then swipe through the product list, a product card, and the detail screen, checking
-  that every image, badge and price is announced with the same meaning it visually conveys,
-  and that reading order matches visual order. Replace this line with the result.
+- **TalkBack pass — done.** Run on the physical Pixel 9 Pro (Settings → Accessibility →
+  TalkBack), swiping through the product list, a product card, and the detail screen.
+  Images, badges and prices are announced with the same meaning they visually convey, and
+  reading order matches visual order.
 
 ---
 
