@@ -1,5 +1,6 @@
 package com.gymshark.catalogue.feature.products
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -90,6 +92,14 @@ private fun ContentState(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // StartupTimingMetric's timeToFullDisplayMs (docs/PERFORMANCE.md §3) needs this — without
+    // it, only timeToInitialDisplayMs is ever recorded, which fires as soon as LoadingState's
+    // first frame draws, before the product fetch even completes.
+    val activity = LocalActivity.current
+    LaunchedEffect(Unit) {
+        activity?.reportFullyDrawn()
+    }
+
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
         onRefresh = onRefresh,

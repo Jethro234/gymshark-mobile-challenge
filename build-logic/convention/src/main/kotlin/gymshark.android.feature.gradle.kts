@@ -16,6 +16,7 @@ dependencies {
 
     add("implementation", libs.findLibrary("androidx-lifecycle-viewmodel-ktx").get())
     add("implementation", libs.findLibrary("androidx-lifecycle-runtime-compose").get())
+    add("implementation", libs.findLibrary("androidx-activity-compose").get())
 
     add("implementation", libs.findLibrary("navigation3-runtime").get())
     add("implementation", libs.findLibrary("navigation3-ui").get())
