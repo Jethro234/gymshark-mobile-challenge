@@ -1,5 +1,6 @@
 plugins {
     id("gymshark.android.application")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
