@@ -1,11 +1,14 @@
 package com.gymshark.catalogue.core.designsystem.theme
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 
 private val LocalGsColorScheme = staticCompositionLocalOf { LightGsColorScheme }
 private val LocalGsTypography = staticCompositionLocalOf { GsDefaultTypography }
@@ -63,7 +66,16 @@ public fun GymsharkTheme(
         LocalGsSpacing provides GsDefaultSpacing,
         LocalGsShapes provides GsDefaultShapes,
     ) {
-        MaterialTheme(colorScheme = materialColorScheme, content = content)
+        MaterialTheme(colorScheme = materialColorScheme) {
+            // No screen sets its own background (docs/DESIGN.md — "the photograph is the
+            // card", not a Surface). Without this, the window's fixed
+            // Theme.Material.Light background (AndroidManifest.xml) shows through
+            // unchanged in dark mode: text correctly flips to white while the canvas
+            // stays light, which is unreadable rather than merely wrong.
+            Surface(modifier = Modifier.fillMaxSize(), color = gsColorScheme.background) {
+                content()
+            }
+        }
     }
 }
 
