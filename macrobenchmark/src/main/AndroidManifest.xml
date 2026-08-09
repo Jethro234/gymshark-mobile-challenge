@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A com.android.test module's own manifest — no <application> element. The
+  instrumentation itself is declared automatically by the androidx.test
+  runner via testInstrumentationRunner (gymshark.android.macrobenchmark
+  convention plugin), targeting :app (targetProjectPath) at build time.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+
+</manifest>
