@@ -33,14 +33,14 @@ instead, called out explicitly below.
 
 ## 3. HTML sanitiser (day 1, ~2h — written test-first)
 
-- [ ] 3.1 Author the expected sanitised output for the committed payload's description **before** writing the implementation, as a golden test resource
-- [ ] 3.2 Define `HtmlSanitiser` returning `SanitisedDescription(heading: String?, bodyHtml: String)` in `:core:model`, with no Android or Compose dependency
-- [ ] 3.3 Implement and individually test: strip inline `<meta>`; strip `data-mce-*`; strip Word clipboard `class` attributes; collapse semantically empty `<span>` wrappers
-- [ ] 3.4 Implement and test extraction of a leading emphasis-only paragraph into `heading`, removed from the body
-- [ ] 3.5 Implement and test conversion of `<br>`-delimited `- ` runs into `<ul><li>`, with the leading hyphen and space removed from item text
-- [ ] 3.6 Implement and test whitespace and empty-paragraph collapsing
-- [ ] 3.7 Assert the full golden: the exact payload description string maps to the committed expected output
-- [ ] 3.8 Break the implementation once to confirm the golden test fails, then restore
+- [x] 3.1 Author the expected sanitised output for the committed payload's description **before** writing the implementation, as a golden test resource
+- [x] 3.2 Define `HtmlSanitiser` returning `SanitisedDescription(heading: String?, bodyHtml: String)` in `:core:model`, with no Android or Compose dependency
+- [x] 3.3 Implement and individually test: strip inline `<meta>`; strip `data-mce-*`; strip Word clipboard `class` attributes; collapse semantically empty `<span>` wrappers
+- [x] 3.4 Implement and test extraction of a leading emphasis-only paragraph into `heading`, removed from the body
+- [x] 3.5 Implement and test conversion of `<br>`-delimited `- ` runs into `<ul><li>`, with the leading hyphen and space removed from item text
+- [x] 3.6 Implement and test whitespace and empty-paragraph collapsing
+- [x] 3.7 Assert the full golden: the exact payload description string maps to the committed expected output
+- [x] 3.8 Break the implementation once to confirm the golden test fails, then restore
 
 ## 4. Data layer (day 1–2, ~3.25h)
 

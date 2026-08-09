@@ -204,10 +204,13 @@ fun interface HtmlSanitiser {
 data class SanitisedDescription(val heading: String?, val bodyHtml: String)
 ```
 
-Ordered, individually tested steps: strip `<meta>`; strip `data-mce-*` and Word `class`
-attributes; collapse `<span>` wrappers that carry no semantics; **extract a leading
-`<strong>`-only paragraph as `heading`**; convert `<br>`-delimited `- ` runs into
-`<ul><li>`; collapse whitespace and empty paragraphs.
+Ordered, individually tested steps: strip `<meta>` (every occurrence — the real payload has a
+second one embedded mid-description, inside a bullet item, not just the leading one); strip a
+stray `<div>` wrapper (one description carries a dead Google Translate widget,
+`<div id="gtx-trans">`); strip `data-mce-*` and Word `class` attributes; collapse `<span>`
+wrappers that carry no semantics; **extract a leading `<strong>`-only paragraph as
+`heading`**; convert `<br>`-delimited `- ` runs into `<ul><li>`; collapse whitespace and
+empty paragraphs, including insignificant newlines the source formats between blocks.
 
 ### Version floor — load-bearing
 
