@@ -86,9 +86,9 @@ instead, called out explicitly below.
 - [x] 7.5 Test that the selected size survives process death via `SavedStateHandle`
 - [x] 7.6 Build a minimal detail screen shell and render the description: `heading` in the `eyebrow` style, body via `remember(bodyHtml) { AnnotatedString.fromHtml(bodyHtml) }`
 - [x] 7.7 Run the app on a device or emulator and manually confirm the description renders real bullets with hanging indentation, **before** building out the rest of the screen. No automated test can check this — `AnnotatedString.fromHtml` needs an Android runtime and there is no snapshot layer (`design.md` §8). If bullets do not render, treat it as a version-floor defect; do not work around it with bullet characters as text — **verified on Pixel_7_API_30 emulator against the real "Speed Leggings | Navy" description: real bullet glyphs, correct hanging indentation, heading in eyebrow style, no raw HTML visible**
-- [ ] 7.8 Build out the remaining screen: hero image with badge, thumbnail strip with selection outline, title, colourway, type, price
-- [ ] 7.9 Add the size chip row driven by real per-size `inStock` data, out-of-stock chips disabled and unselectable
-- [ ] 7.10 Add the material chip row (`GsMaterialChip` per sustainability label) after the hairline, before the description; shown independently of whether the hero badge is also showing a merchandising label. Verify against the one real product carrying `new` plus both recycled labels — badge and chips both present, no overflow handling needed
+- [x] 7.8 Build out the remaining screen: hero image with badge, thumbnail strip with selection outline, title, colourway, type, price
+- [x] 7.9 Add the size chip row driven by real per-size `inStock` data, out-of-stock chips disabled and unselectable
+- [x] 7.10 Add the material chip row (`GsMaterialChip` per sustainability label) after the hairline, before the description; shown independently of whether the hero badge is also showing a merchandising label. Verify against the one real product carrying `new` plus both recycled labels — badge and chips both present, no overflow handling needed — **verified on-device against "Adapt Ombre Seamless Leggings | Rose Pink · Light Blue": New badge on the hero and both Recycled nylon/Recycled polyester chips all present simultaneously**
 
 ## 8. Navigation and wiring (day 3, ~0.5h)
 
