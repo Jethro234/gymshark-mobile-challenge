@@ -68,14 +68,14 @@ instead, called out explicitly below.
 
 ## 6. Product list (day 2, ~2.5h)
 
-- [ ] 6.1 Add `ProductListUiState` with `Loading`, `Content(products, isRefreshing)`, `Empty` and `Error(cause)`, and `@Immutable` UI models holding `ImmutableList`
-- [ ] 6.2 Add `ProductListViewModel` exposing state via `stateIn(WhileSubscribed(5_000))`, mapping products in the ViewModel rather than in composition
-- [ ] 6.3 Test the state machine with Turbine: loading → content, loading → empty, loading → error per cause, retry recovery
-- [ ] 6.4 Test that refresh keeps content on screen while in flight and on failure
-- [ ] 6.5 Build the grid screen — wordmark, title, count, two-column `LazyVerticalGrid` with stable `key` and `contentType`, `safeDrawing` content padding, edge to edge
-- [ ] 6.6 Add pull-to-refresh, and the error state with its per-cause message and retry action
-- [ ] 6.7 Add scroll position restoration via `rememberSaveable`
-- [ ] 6.8 Run the app on a device or emulator with the layout direction forced to right-to-left and confirm the list screen mirrors correctly — all padding/alignment via `start`/`end`, back and directional icons flipped. Manual check; no automated snapshot layer exists to pin it
+- [x] 6.1 Add `ProductListUiState` with `Loading`, `Content(products, isRefreshing)`, `Empty` and `Error(cause)`, and `@Immutable` UI models holding `ImmutableList`
+- [x] 6.2 Add `ProductListViewModel` exposing state via `stateIn(WhileSubscribed(5_000))`, mapping products in the ViewModel rather than in composition
+- [x] 6.3 Test the state machine with Turbine: loading → content, loading → empty, loading → error per cause, retry recovery
+- [x] 6.4 Test that refresh keeps content on screen while in flight and on failure
+- [x] 6.5 Build the grid screen — wordmark, title, count, two-column `LazyVerticalGrid` with stable `key` and `contentType`, `safeDrawing` content padding, edge to edge
+- [x] 6.6 Add pull-to-refresh, and the error state with its per-cause message and retry action
+- [x] 6.7 Add scroll position restoration via `rememberSaveable`
+- [ ] 6.8 Run the app on a device or emulator with the layout direction forced to right-to-left and confirm the list screen mirrors correctly — all padding/alignment via `start`/`end`, back and directional icons flipped. Manual check; no automated snapshot layer exists to pin it — **outstanding: needs a human on a device/emulator, cannot be done from this session**
 
 ## 7. Product detail (day 3, ~3h)
 
@@ -92,7 +92,7 @@ instead, called out explicitly below.
 
 ## 8. Navigation and wiring (day 3, ~0.5h)
 
-- [ ] 8.1 Add the Hilt application root and modules — `@Singleton` for `OkHttpClient`, Retrofit and `ProductRepository`
+- [x] 8.1 Add the Hilt application root and modules — `@Singleton` for `OkHttpClient`, Retrofit and `ProductRepository` — pulled forward into group 6, since `@HiltAndroidApp` already existed and `ProductListViewModel`'s `@Inject` constructor needed the binding to exist for `:app` to compile at all
 - [ ] 8.2 Wire `NavDisplay` with `@Serializable` route keys, passing the product id only, and both entry decorators so ViewModels scope to the `NavEntry` and clear on pop
 - [ ] 8.3 Verify predictive back, and that the back icon uses an `AutoMirrored` variant
 
