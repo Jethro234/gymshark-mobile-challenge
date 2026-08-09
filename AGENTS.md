@@ -71,8 +71,11 @@ This is the section that matters most. Agents fail here, not on the code.
   until a human runs the benchmark on a physical device. Do not estimate, extrapolate, or
   supply typical values. Build the benchmark module so the numbers *can* be produced; do
   not produce them.
-- **Do not create screenshots.** README image paths are placeholders. Screenshots are
-  generated from committed Paparazzi goldens, by a human, after the UI exists.
+- **Never invent, mock up, or source a screenshot from anywhere but the real running app.**
+  There is no snapshot-testing layer — Paparazzi's Gradle plugin is incompatible with the
+  AGP version Hilt requires (`design.md` of the `build-product-catalogue` change) — so there
+  are no goldens to generate them from. Screenshots come from a real device or emulator
+  running the actual build, captured by whoever has that tooling available.
 - **Do not add features.** No bottom navigation, no "Add to bag", no favourites, no search,
   no sort, no filter, no basket, no analytics, no crash reporting, no splash screen, no
   onboarding. `docs/DESIGN.md` records these as deliberate cuts. **Nothing ships that does not
@@ -123,10 +126,13 @@ anything else requires stopping and asking.
 | Images | Coil 3 (`coil-compose`, `coil-network-okhttp`) |
 | Async | `kotlinx-coroutines`, `kotlinx-collections-immutable` |
 | Unit test | JUnit 5, **`de.mannodermaus.android-junit5` Gradle plugin — approved**, Turbine, `kotlinx-coroutines-test`, MockWebServer, Truth or kotlin.test |
-| Snapshot | Paparazzi |
 | Instrumented | `compose-ui-test-junit4`, `hilt-android-testing` |
 | Perf | `androidx.benchmark:benchmark-macro-junit4`, `androidx.baselineprofile` plugin |
 | Quality | ktlint, detekt, Kover |
+
+**No snapshot-testing entry.** Paparazzi was the plan, but its Gradle plugin is incompatible
+with the AGP version Hilt requires — see `design.md` of the `build-product-catalogue` change.
+Not approved, not used.
 
 **On JUnit 5:** the reviewer is correct that AGP will not run JUnit 5 in an Android library
 module without the Mannodermaus plugin. It is approved. `:core:model` is a pure JVM module
@@ -170,7 +176,10 @@ A task is complete when **all** of the following hold. Not four of five.
 - [ ] ktlint, detekt and Android Lint pass with no new suppressions
 - [ ] Unit tests written and passing, with assertions derived from the brief and the
       payload — **not from reading the implementation**
-- [ ] Paparazzi goldens recorded where the change is visual
+- [ ] No snapshot layer exists to record a golden against (Paparazzi's Gradle plugin is
+      incompatible with the AGP version Hilt requires); where a change would have relied on
+      one, it's verified with a manual on-device check instead (bullet rendering, RTL
+      mirroring) — do that check before calling the task done
 - [ ] No `!!`, no `lateinit`, no `TODO`, no commented-out code
 - [ ] One Conventional Commit, scoped by module, subject under 72 characters, imperative
       mood, body explaining *why* if the why is not obvious

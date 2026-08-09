@@ -11,6 +11,14 @@ This document records the decisions taken before a line of code was written, and
 importantly — the reasoning and the alternatives rejected. Where the brief or the payload
 was ambiguous, the assumption is stated explicitly rather than hidden in an implementation.
 
+> **One deviation from this record, found during implementation, not before it:** every
+> mention of Paparazzi below — §9.2's snapshot layer chiefly, but also the smaller references
+> throughout — was the agreed plan and was never built. Its Gradle plugin is incompatible
+> with the AGP version Hilt requires; `design.md` §8 of the `build-product-catalogue` change
+> has the full account. Kept here rather than silently edited out, because the reasoning that
+> led to Paparazzi in the first place is still real reasoning. `DESIGN.md` §8, `README.md`
+> and `CONVENTIONS.md` §2/§5 describe what was actually built in its place.
+
 ---
 
 ## 1. What the brief actually asks for
@@ -76,7 +84,7 @@ The endpoint returns an **Algolia search response** whose only top-level key is 
 :core:model           Pure Kotlin/JVM. Product, Label, Money, HtmlSanitiser. Zero Android deps.
 :core:data            Retrofit + kotlinx.serialization, DTOs, mappers, ProductRepository, cache.
 :core:designsystem    Theme tokens, GsAsyncImage, GsLabelBadge, previews.
-:core:testing         Shared fixtures, MainDispatcherRule, Paparazzi base, fake repositories.
+:core:testing         Shared fixtures, MainDispatcherRule, fake repositories.
 :feature:products     ProductList and ProductDetail — ViewModels, screens, UiState.
 ```
 
@@ -91,8 +99,8 @@ not need writing. See `SCOPE.md` for the budget this serves.
   `:app`. This is the constraint that proves the pattern is understood rather than copied.
 - **`:core:model` has no Android dependency at all.** Its tests are plain JVM tests and run
   in milliseconds. Mapper, `Money` and `HtmlSanitiser` tests all live here.
-- **`:core:testing` exists.** Fixtures defined once, used by unit tests, Paparazzi tests and
-  instrumented tests. This is the module most take-homes omit.
+- **`:core:testing` exists.** Fixtures defined once, used by unit tests and instrumented
+  tests. This is the module most take-homes omit.
 
 **Rejected:** single-module with strict packages (faster, and arguably right for two
 screens, but forfeits any demonstration of boundary design); layer-based modularisation
@@ -224,9 +232,11 @@ lines.
 including nested lists, provided a nested `<ul>` sits *inside* an `<li>`. `Bullet` carries
 `DefaultIndentation = 1.em`, `DefaultSize = 0.25.em`, `DefaultPadding = 0.25.em`.
 
-**Pin the Compose BOM accordingly and verify with a Paparazzi golden before building the
-detail screen.** If the bullets do not render, the version floor is wrong — do not work
-around it by emitting bullet glyphs as text.
+**Pin the Compose BOM accordingly and verify bullet rendering before building the detail
+screen.** Planned as a Paparazzi golden; there is no snapshot layer (§9.2's erratum above),
+so this is a manual on-device check instead, done once and recorded rather than repeated
+per change. If the bullets do not render, the version floor is wrong — do not work around it
+by emitting bullet glyphs as text.
 
 `fromHtml` still *silently ignores* tags it does not understand, so sanitising remains
 correctness rather than politeness.
@@ -418,7 +428,7 @@ response. Each asserted end-to-end through repository → ViewModel → the corr
 `MainDispatcherRule` and an injected `CoroutineDispatcher` — no `Dispatchers.IO` hardcoded
 anywhere, which is what makes any of this testable.
 
-### 9.2 Snapshot — Paparazzi
+### 9.2 Snapshot — Paparazzi (planned; not built — see the erratum at the top of this document)
 
 JVM-only, no emulator, runs in CI on every PR. Goldens for:
 
@@ -471,9 +481,10 @@ Stated in the README, because naming this is judgement rather than omission:
 - Compose framework internals; Coil's own loading and caching behaviour.
 - Hilt graph construction — a compile-time concern, verified by the build.
 - Theme token values in isolation, beyond the automated contrast check over token pairs.
-- Exhaustive permutations of Paparazzi goldens. The matrix in `DESIGN.md` §8 covers the
-  states that can actually break; every additional golden is a file to review on every
-  visual change, and a suite nobody wants to update is a suite that gets deleted.
+- Any visual/snapshot coverage at all, beyond the two manual on-device checks (bullet
+  rendering, RTL mirroring) and the unit suite's behavioural coverage of each `UiState`.
+  Planned as a Paparazzi golden matrix; not built — see the erratum at the top of this
+  document and `DESIGN.md` §8 for what replaced it and what that leaves uncovered.
 
 ---
 

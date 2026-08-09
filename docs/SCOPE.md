@@ -7,6 +7,13 @@ cut. A complete modest submission beats an ambitious half-finished one every tim
 anything deferred is listed in the README as a conscious decision, which reads as judgement
 rather than omission.
 
+**Every Paparazzi mention below is this document doing its job — planning for it, and
+naming the fallback if it fell through** (§6's "Paparazzi/JDK version friction" row is
+exactly the fallback that ended up firing: its Gradle plugin turned out incompatible with
+the AGP version Hilt requires, not just a JDK issue. `design.md` §8 of the
+`build-product-catalogue` change has the full account; `DESIGN.md` §8 describes what was
+built instead). None of it describes the shipped app.
+
 ---
 
 ## 1. What the brief actually grades
