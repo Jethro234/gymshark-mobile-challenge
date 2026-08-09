@@ -56,15 +56,15 @@ instead, called out explicitly below.
 
 ## 5. Design system (day 2, ~2h)
 
-- [ ] 5.1 Write the WCAG AA contrast test over every token pair **before** the tokens are consumed by any screen
-- [ ] 5.2 Add the colour tokens for light and dark from `docs/DESIGN.md` §1, including the corrected `textMuted` values, and make the contrast test pass
-- [ ] 5.3 Add the type scale, spacing scale and corner radii tokens; all text in `sp`, no elevation anywhere
-- [ ] 5.4 Add `GsAsyncImage` wrapping `AsyncImage` with loading, loaded and error states sharing one shape instance, aspect ratio reserved from payload dimensions, and explicit size hints
-- [ ] 5.5 Implement the `contentDescription` fallback: `alt` when present, product title otherwise
-- [ ] 5.6 Add `GsLabelBadge` for merchandising labels only, with the two visual tiers (urgency: going fast/limited edition; informational: new/popular) plus the quiet outlined `Unknown` treatment showing the raw value title-cased
-- [ ] 5.7 Add `GsMaterialChip` for sustainability labels, reusing the `success` token pair freed up now that "back in stock" isn't a real label
-- [ ] 5.8 Add `GsSizeChip` with selected, available and out-of-stock states, the out-of-stock state carrying a `stateDescription`
-- [ ] 5.9 Add `GsProductCard` with intrinsic height, two-line title clamp and one-line colourway clamp
+- [x] 5.1 Write the WCAG AA contrast test over every token pair **before** the tokens are consumed by any screen
+- [x] 5.2 Add the colour tokens for light and dark from `docs/DESIGN.md` §1, including the corrected `textMuted` values, and make the contrast test pass
+- [x] 5.3 Add the type scale, spacing scale and corner radii tokens; all text in `sp`, no elevation anywhere
+- [x] 5.4 Add `GsAsyncImage` wrapping `AsyncImage` with loading, loaded and error states sharing one shape instance, aspect ratio reserved from payload dimensions, and explicit size hints
+- [x] 5.5 Implement the `contentDescription` fallback: `alt` when present, product title otherwise
+- [x] 5.6 Add `GsLabelBadge` for merchandising labels only, with the two visual tiers (urgency: going fast/limited edition; informational: new/popular) plus the quiet outlined `Unknown` treatment showing the raw value title-cased
+- [x] 5.7 Add `GsMaterialChip` for sustainability labels, reusing the `success` token pair freed up now that "back in stock" isn't a real label
+- [x] 5.8 Add `GsSizeChip` with selected, available and out-of-stock states, the out-of-stock state carrying a `stateDescription`
+- [x] 5.9 Add `GsProductCard` with intrinsic height, two-line title clamp and one-line colourway clamp
 
 ## 6. Product list (day 2, ~2.5h)
 
