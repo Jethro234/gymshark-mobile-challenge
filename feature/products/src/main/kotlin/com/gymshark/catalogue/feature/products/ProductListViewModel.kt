@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gymshark.catalogue.core.data.ProductRepository
 import com.gymshark.catalogue.core.data.toErrorCause
-import com.gymshark.catalogue.core.designsystem.component.GsLabelTier
 import com.gymshark.catalogue.core.model.ErrorCause
-import com.gymshark.catalogue.core.model.Label
 import com.gymshark.catalogue.core.model.Product
 import com.gymshark.catalogue.core.model.merchandisingBadge
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
 
 private const val STOP_TIMEOUT_MILLIS = 5_000L
@@ -131,31 +128,3 @@ private fun Product.toUiModel(): ProductUiModel {
         badgeTier = badge?.toBadgeTier(),
     )
 }
-
-/** GBP, always — the payload has no locale field and the brand this catalogue represents is UK-only. */
-private val DISPLAY_LOCALE: Locale = Locale.UK
-
-private fun Label.toBadgeText(): String =
-    when (this) {
-        Label.GoingFast -> "Going fast"
-        Label.LimitedEdition -> "Limited edition"
-        Label.New -> "New"
-        Label.Popular -> "Popular"
-        Label.RecycledNylon, Label.RecycledPolyester ->
-            error("Sustainability label reached the merchandising badge slot: $raw")
-        is Label.Unknown -> raw.toDisplayTitleCase()
-    }
-
-private fun Label.toBadgeTier(): GsLabelTier =
-    when (this) {
-        Label.GoingFast, Label.LimitedEdition -> GsLabelTier.Urgency
-        Label.New, Label.Popular -> GsLabelTier.Informational
-        Label.RecycledNylon, Label.RecycledPolyester ->
-            error("Sustainability label reached the merchandising badge slot: $raw")
-        is Label.Unknown -> GsLabelTier.Unknown
-    }
-
-private fun String.toDisplayTitleCase(): String =
-    split('-', ' ')
-        .filter(String::isNotBlank)
-        .joinToString(" ") { word -> word.replaceFirstChar(Char::uppercase) }
