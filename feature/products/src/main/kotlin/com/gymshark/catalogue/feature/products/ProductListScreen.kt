@@ -123,6 +123,8 @@ private fun ContentState(
                 GsProductCard(
                     imageUrl = product.imageUrl,
                     imageAlt = product.imageAlt,
+                    imageWidth = product.imageWidth,
+                    imageHeight = product.imageHeight,
                     title = product.title,
                     colourway = product.colourway,
                     price = product.price,

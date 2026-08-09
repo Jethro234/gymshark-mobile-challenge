@@ -17,7 +17,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.gymshark.catalogue.core.designsystem.theme.GsTheme
 
-private const val CARD_ASPECT_RATIO = 3f / 4f
 private val BADGE_INSET = 10.dp
 private val TITLE_TOP_SPACING = 11.dp
 private val COLOURWAY_TOP_SPACING = 3.dp
@@ -27,14 +26,17 @@ private const val TITLE_MAX_LINES = 2
 private const val COLOURWAY_MAX_LINES = 1
 
 /**
- * A grid product card: image (3:4, `card` radius) → title → colourway → price. Intrinsically
- * sized — no fixed height — so it reflows rather than clips at large font scales
- * (`docs/DESIGN.md` §2, §4). No border, no background, no shadow: the photograph is the card.
+ * A grid product card: image (`card` radius, ratio reserved from the payload's own
+ * dimensions) → title → colourway → price. Intrinsically sized — no fixed height — so it
+ * reflows rather than clips at large font scales (`docs/DESIGN.md` §2, §4). No border, no
+ * background, no shadow: the photograph is the card.
  */
 @Composable
 public fun GsProductCard(
     imageUrl: String?,
     imageAlt: String?,
+    imageWidth: Int?,
+    imageHeight: Int?,
     title: String,
     colourway: String,
     price: String,
@@ -49,7 +51,8 @@ public fun GsProductCard(
             GsAsyncImage(
                 model = imageUrl,
                 contentDescription = imageAlt ?: title,
-                aspectRatio = CARD_ASPECT_RATIO,
+                contentWidth = imageWidth,
+                contentHeight = imageHeight,
                 shape = GsTheme.shapes.card,
                 modifier = Modifier.fillMaxWidth(),
             )

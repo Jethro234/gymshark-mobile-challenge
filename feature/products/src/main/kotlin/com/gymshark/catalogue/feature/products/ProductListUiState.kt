@@ -39,6 +39,8 @@ data class ProductUiModel(
     val id: String,
     val imageUrl: String?,
     val imageAlt: String?,
+    val imageWidth: Int?,
+    val imageHeight: Int?,
     val title: String,
     val colourway: String,
     val price: String,

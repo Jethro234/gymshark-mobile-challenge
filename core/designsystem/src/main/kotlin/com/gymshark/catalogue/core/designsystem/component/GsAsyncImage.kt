@@ -39,6 +39,9 @@ import com.gymshark.catalogue.core.designsystem.theme.GsTheme
 
 private const val CROSSFADE_DURATION_MILLIS = 200
 private const val HAIRLINE_WIDTH_DP = 0.5f
+
+/** Used only when the payload supplies no usable dimensions — a sensible portrait fallback. */
+private const val DEFAULT_ASPECT_RATIO = 0.75f
 private const val SHIMMER_MIN_ALPHA = 0.6f
 private const val SHIMMER_MAX_ALPHA = 1f
 private const val SHIMMER_DURATION_MILLIS = 900
@@ -56,22 +59,31 @@ private const val GLYPH_BASE_RIGHT_Y_FRACTION = 0.85f
  * measurably more expensive in a scrolling grid (`docs/ARCHITECTURE.md` §12).
  *
  * All three states — loading, loaded, error — share one [shape] instance so a mismatch never
- * produces a corner pop when an image resolves mid-scroll. [aspectRatio] is reserved before
- * the image loads, so the grid never reflows once it does; Coil's own constraint-based size
- * resolution — not `Size.ORIGINAL` — keeps a large source image from decoding at full
- * resolution into a small cell.
+ * produces a corner pop when an image resolves mid-scroll. The aspect ratio is reserved from
+ * [contentWidth]/[contentHeight] — the payload's own media dimensions — before the image
+ * loads, so the grid never reflows once it does; when neither is supplied, a fixed portrait
+ * fallback is reserved instead. Coil's own constraint-based size resolution — not
+ * `Size.ORIGINAL` — keeps a large source image from decoding at full resolution into a small
+ * cell.
  */
 @Composable
 public fun GsAsyncImage(
     model: String?,
     contentDescription: String?,
-    aspectRatio: Float,
+    contentWidth: Int?,
+    contentHeight: Int?,
     modifier: Modifier = Modifier,
     shape: Shape = GsTheme.shapes.card,
 ) {
     var state by remember(model) {
         mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty)
     }
+    val aspectRatio =
+        if (contentWidth != null && contentHeight != null && contentHeight > 0) {
+            contentWidth.toFloat() / contentHeight.toFloat()
+        } else {
+            DEFAULT_ASPECT_RATIO
+        }
 
     Box(
         modifier =

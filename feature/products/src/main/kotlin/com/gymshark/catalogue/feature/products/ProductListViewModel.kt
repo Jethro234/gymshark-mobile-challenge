@@ -121,6 +121,8 @@ private fun Product.toUiModel(): ProductUiModel {
         id = id,
         imageUrl = featuredMedia?.url,
         imageAlt = featuredMedia?.alt,
+        imageWidth = featuredMedia?.width,
+        imageHeight = featuredMedia?.height,
         title = title,
         colourway = colour,
         price = price.format(DISPLAY_LOCALE),

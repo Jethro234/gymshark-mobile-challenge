@@ -118,9 +118,11 @@ There is a Paparazzi golden for this.
 
 ### `GsProductCard`
 
-Intrinsic height. Image (3:4, `card` radius) → 11dp → title → 3dp → colourway → 7dp → price.
-No border, no background, no shadow — the photograph is the card. Title clamps to 2 lines,
-colourway to 1.
+Intrinsic height. Image (`card` radius, aspect ratio reserved from the payload's own
+`featuredMedia.width`/`height` — ~4:5 across the real payload, close to but not exactly the
+3:4 sketched here; a fixed ratio was rejected because it would crop or letterbox against the
+real photos) → 11dp → title → 3dp → colourway → 7dp → price. No border, no background, no
+shadow — the photograph is the card. Title clamps to 2 lines, colourway to 1.
 
 Multi-value colours are normalised: the payload's `"Court Blue/Moonstone Blue/White"` and
 `"Savanna | Cherry Brown"` both render `·`-separated. Pure function, unit-tested.
@@ -246,7 +248,8 @@ supported and **never blanks the list** — `isRefreshing` lives inside `Content
 
 ### Product detail
 
-Back → hero image 4:5 with badge → 10dp → thumbnail strip (selected thumbnail carries a
+Back → hero image (aspect ratio reserved from the selected media's own dimensions, per
+`product-imagery`) with badge → 10dp → thumbnail strip (selected thumbnail carries a
 1.5dp `textPrimary` outline) → 18dp → title → colourway · type → price → `SIZE` eyebrow →
 size chips → hairline → material chips (if any) → sanitised description. No bottom bar, no
 CTA.
