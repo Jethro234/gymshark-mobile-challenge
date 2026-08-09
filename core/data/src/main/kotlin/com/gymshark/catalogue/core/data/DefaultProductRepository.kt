@@ -12,8 +12,11 @@ import kotlinx.coroutines.withContext
 /**
  * @param ioDispatcher Injected rather than hardcoded (docs/ARCHITECTURE.md §9.0), so tests can
  *   substitute a deterministic dispatcher.
+ *
+ * Internal — constructed only by [ProductRepositoryFactory] and this module's own tests;
+ * everything else depends on the [ProductRepository] interface.
  */
-public class DefaultProductRepository(
+internal class DefaultProductRepository(
     private val service: AlgoliaService,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ProductRepository {

@@ -8,9 +8,9 @@ import com.gymshark.catalogue.core.model.ProductSize
 import com.gymshark.catalogue.core.model.normaliseColour
 import com.gymshark.catalogue.core.model.parseLabels
 
-public fun AlgoliaEnvelopeDto.toDomain(): List<Product> = hits.map(ProductDto::toDomain)
+internal fun AlgoliaEnvelopeDto.toDomain(): List<Product> = hits.map(ProductDto::toDomain)
 
-public fun ProductDto.toDomain(): Product {
+internal fun ProductDto.toDomain(): Product {
     val sanitisedDescription = DefaultHtmlSanitiser.sanitise(description)
     val isBrokenImageProduct = objectId == BROKEN_IMAGE_PRODUCT_ID
     return Product(
@@ -38,7 +38,7 @@ public fun ProductDto.toDomain(): Product {
     )
 }
 
-public fun MediaDto.toDomain(brokenImage: Boolean = false): ProductMedia =
+internal fun MediaDto.toDomain(brokenImage: Boolean = false): ProductMedia =
     ProductMedia(
         url = if (brokenImage) BROKEN_IMAGE_URL else src,
         alt = alt,
@@ -46,7 +46,7 @@ public fun MediaDto.toDomain(brokenImage: Boolean = false): ProductMedia =
         height = height,
     )
 
-public fun SizeDto.toDomain(): ProductSize =
+internal fun SizeDto.toDomain(): ProductSize =
     ProductSize(
         size = size,
         inStock = inStock,

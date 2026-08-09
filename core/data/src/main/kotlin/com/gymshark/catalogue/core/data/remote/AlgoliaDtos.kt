@@ -10,8 +10,8 @@ import kotlinx.serialization.Serializable
  * sends that this app doesn't model.
  */
 @Serializable
-public data class AlgoliaEnvelopeDto(
-    public val hits: List<ProductDto> = emptyList(),
+internal data class AlgoliaEnvelopeDto(
+    val hits: List<ProductDto> = emptyList(),
 )
 
 /**
@@ -26,33 +26,33 @@ public data class AlgoliaEnvelopeDto(
  * one the endpoint's own indexing already guarantees this for).
  */
 @Serializable
-public data class ProductDto(
-    @SerialName("objectID") public val objectId: String,
-    public val title: String,
-    public val description: String = "",
-    public val colour: String,
-    public val type: String? = null,
-    public val fit: String? = null,
-    public val price: Long,
-    public val compareAtPrice: Long? = null,
-    public val discountPercentage: Int? = null,
-    public val labels: List<String>? = null,
-    public val featuredMedia: MediaDto? = null,
-    public val media: List<MediaDto> = emptyList(),
-    public val availableSizes: List<SizeDto> = emptyList(),
+internal data class ProductDto(
+    @SerialName("objectID") val objectId: String,
+    val title: String,
+    val description: String = "",
+    val colour: String,
+    val type: String? = null,
+    val fit: String? = null,
+    val price: Long,
+    val compareAtPrice: Long? = null,
+    val discountPercentage: Int? = null,
+    val labels: List<String>? = null,
+    val featuredMedia: MediaDto? = null,
+    val media: List<MediaDto> = emptyList(),
+    val availableSizes: List<SizeDto> = emptyList(),
 )
 
 @Serializable
-public data class MediaDto(
-    public val src: String,
-    public val alt: String? = null,
-    public val width: Int? = null,
-    public val height: Int? = null,
+internal data class MediaDto(
+    val src: String,
+    val alt: String? = null,
+    val width: Int? = null,
+    val height: Int? = null,
 )
 
 @Serializable
-public data class SizeDto(
-    public val size: String,
-    public val inStock: Boolean,
-    public val inventoryQuantity: Int = 0,
+internal data class SizeDto(
+    val size: String,
+    val inStock: Boolean,
+    val inventoryQuantity: Int = 0,
 )
