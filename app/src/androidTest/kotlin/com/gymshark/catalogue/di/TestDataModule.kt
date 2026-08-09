@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 /**
@@ -30,4 +31,12 @@ internal object TestDataModule {
     @Provides
     @Singleton
     fun provideProductRepository(): ProductRepository = TestRepositoryHolder.repository
+
+    // Replacing DataModule wholesale means re-providing everything it used to, not just
+    // ProductRepository — GymsharkApplication.okHttpClient is a field injection Hilt
+    // validates for every component build, test included, even though HiltTestApplication
+    // (not GymsharkApplication) is what actually runs under test.
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient = OkHttpClient()
 }

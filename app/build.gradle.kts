@@ -35,6 +35,12 @@ dependencies {
 
     implementation(libs.okhttp.core)
     implementation(libs.kotlinx.coroutines.core)
+    // GymsharkApplication.newImageLoader — :core:designsystem depends on Coil via
+    // `implementation`, not `api`, so :app needs its own direct dependency to build a shared
+    // ImageLoader off the same OkHttpClient Retrofit uses. coil-compose (not just
+    // coil-network-okhttp) is needed for SingletonImageLoader itself.
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     androidTestImplementation(project(":core:testing"))
     androidTestImplementation(libs.hilt.android.testing)
