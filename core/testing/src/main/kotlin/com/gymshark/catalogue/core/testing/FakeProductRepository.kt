@@ -3,6 +3,7 @@ package com.gymshark.catalogue.core.testing
 import com.gymshark.catalogue.core.data.ProductNotFoundException
 import com.gymshark.catalogue.core.data.ProductRepository
 import com.gymshark.catalogue.core.model.Product
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -18,6 +19,13 @@ import kotlinx.coroutines.flow.flow
  */
 public class FakeProductRepository : ProductRepository {
     public var remoteProducts: Result<List<Product>> = Result.success(emptyList())
+
+    /**
+     * When set, a network fetch — the cache-miss path of [getProducts], or [refresh] — suspends
+     * until it completes. The hook a test needs to observe an "in flight" state (loading, or a
+     * refresh in progress) deterministically, rather than racing a real network delay.
+     */
+    public var fetchGate: CompletableDeferred<Unit>? = null
 
     private var cache: List<Product>? = null
 
@@ -50,5 +58,8 @@ public class FakeProductRepository : ProductRepository {
         return if (product != null) Result.success(product) else Result.failure(ProductNotFoundException(id))
     }
 
-    private fun fetchAndCache(): Result<List<Product>> = remoteProducts.onSuccess { cache = it }
+    private suspend fun fetchAndCache(): Result<List<Product>> {
+        fetchGate?.await()
+        return remoteProducts.onSuccess { cache = it }
+    }
 }
