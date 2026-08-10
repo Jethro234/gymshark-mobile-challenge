@@ -308,7 +308,14 @@ button is worse than no button.
     folds in the resolved display size, so the half-width grid thumbnail is a cache *miss* for
     the full-width hero — and with the disk cache cut (Appendix A), that miss is a network
     round trip. The symptom was precise: the expansion was empty on a product's first visit
-    and instant on every visit after, because only then was a hero-sized entry in memory.
+    and instant on every visit after, because only then was a hero-sized entry in memory. The
+    card reads the same key back as well as writing it, because `NavDisplay` recomposes the
+    list from scratch on back navigation — without it the shrinking hero lands on a card that
+    has restarted at a shimmer.
+  - `GsAsyncImage` draws its shimmer as an *overlay*, so it is now conditional on there being
+    nothing underneath: Coil supplies a painter the moment `placeholderMemoryCacheKey`
+    resolves, and painting the shimmer over it regardless is what remained of the flicker
+    after the cache keys were right. Images with no placeholder key are unaffected.
 - Nothing else. No staggered list entrance animations — they look impressive in a demo and
   cost frames on every scroll, which conflicts with the performance goals.
 

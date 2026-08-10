@@ -117,7 +117,11 @@ public fun GsAsyncImage(
                 onState = { state = it },
             )
 
-            when (state) {
+            // The shimmer is an overlay, so it must only be drawn when there is genuinely
+            // nothing underneath it. Coil hands back a painter as soon as
+            // [placeholderMemoryCacheKey] resolves — covering that with the shimmer anyway is
+            // what made the detail hero flicker on a product's first visit.
+            when (val current = state) {
                 is AsyncImagePainter.State.Error ->
                     GsAsyncImageErrorFallback(
                         showLabel = showErrorLabel,
@@ -127,10 +131,17 @@ public fun GsAsyncImage(
                                 .border(HAIRLINE_WIDTH_DP.dp, GsTheme.colorScheme.border, shape),
                     )
 
-                is AsyncImagePainter.State.Loading, AsyncImagePainter.State.Empty ->
-                    GsAsyncImageShimmer(
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                is AsyncImagePainter.State.Loading ->
+                    if (current.painter == null) {
+                        GsAsyncImageShimmer(modifier = Modifier.fillMaxSize())
+                    }
+
+                // The single frame before the request starts, where that key hasn't been
+                // consulted yet — shimmering here would be the same one-frame flash.
+                AsyncImagePainter.State.Empty ->
+                    if (placeholderMemoryCacheKey == null) {
+                        GsAsyncImageShimmer(modifier = Modifier.fillMaxSize())
+                    }
 
                 is AsyncImagePainter.State.Success -> Unit
             }
