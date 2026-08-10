@@ -111,23 +111,6 @@ Stated rather than buried, because the payload is ambiguous in places.
 
 ---
 
-## What was deliberately left out
-
-The brief asks for a product list, a detail screen, and the description rendered
-appropriately. That is what this is.
-
-No bottom navigation, no "Add to bag", no favourites, no search. Each would have been an
-affordance with nothing behind it, and a button that does nothing is worse than a button
-that isn't there. **Nothing on screen is inert** — every element is backed by payload data or
-real behaviour.
-
-The one thing that might look like scope creep is the **size chips**, and they earn their
-place: `availableSizes` carries genuine per-size `inStock` data, so rendering it — including
-out-of-stock sizes as disabled — is product information the brief asks the detail screen to
-show. Selection is local state and claims nothing more.
-
----
-
 ## Proving robustness against an endpoint that never fails
 
 The supplied URL is a static CDN file. It cannot return 500, cannot time out, cannot return
