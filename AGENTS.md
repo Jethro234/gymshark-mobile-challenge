@@ -180,7 +180,12 @@ A task is complete when **all** of the following hold. Not four of five.
       incompatible with the AGP version Hilt requires); where a change would have relied on
       one, it's verified with a manual on-device check instead (bullet rendering, RTL
       mirroring) — do that check before calling the task done
-- [ ] No `!!`, no `lateinit`, no `TODO`, no commented-out code
+- [ ] No `!!`, no `TODO`, no commented-out code. No `lateinit` either, with one exception:
+      Hilt field injection into an Android framework type it constructs itself — currently
+      only `GymsharkApplication.okHttpClient`, which Coil's `SingletonImageLoader.Factory`
+      needs (`docs/ARCHITECTURE.md` §12). Constructor injection is unavailable there, so the
+      rule would otherwise forbid the only form the framework supports. Anywhere a
+      constructor can take the dependency, this exception does not apply
 - [ ] One Conventional Commit, scoped by module, subject under 72 characters, imperative
       mood, body explaining *why* if the why is not obvious
 
