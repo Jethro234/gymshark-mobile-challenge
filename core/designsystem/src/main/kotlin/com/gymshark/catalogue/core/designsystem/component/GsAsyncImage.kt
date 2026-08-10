@@ -68,6 +68,9 @@ public fun GsAsyncImage(
     modifier: Modifier = Modifier,
     shape: Shape = GsTheme.shapes.card,
     showErrorLabel: Boolean = true,
+    isLoading: Boolean = false,
+    memoryCacheKey: String? = null,
+    placeholderMemoryCacheKey: String? = null,
 ) {
     var state by remember(model) {
         mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty)
@@ -86,35 +89,51 @@ public fun GsAsyncImage(
                 .clip(shape)
                 .background(GsTheme.colorScheme.surface),
     ) {
-        AsyncImage(
-            model =
-                ImageRequest
-                    .Builder(LocalContext.current)
-                    .data(model)
-                    .crossfade(CROSSFADE_DURATION_MILLIS)
-                    .build(),
-            contentDescription = contentDescription,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            onState = { state = it },
-        )
+        // Coil treats a null request `data` as an immediate NullRequestDataException, not
+        // "still loading" — so a caller that hasn't resolved a real url yet (as opposed to a
+        // product genuinely having no image) must say so explicitly via [isLoading], or the
+        // shimmer below would flash the error fallback instead.
+        if (isLoading) {
+            GsAsyncImageShimmer(modifier = Modifier.fillMaxSize())
+        } else {
+            AsyncImage(
+                model =
+                    ImageRequest
+                        .Builder(LocalContext.current)
+                        .data(model)
+                        .crossfade(CROSSFADE_DURATION_MILLIS)
+                        // Coil's default memory cache key folds in the resolved display size,
+                        // so the same photo cached for a small grid cell is a miss for a
+                        // full-width hero. [memoryCacheKey] pins an entry under a
+                        // size-independent key; [placeholderMemoryCacheKey] reads that entry
+                        // back so a larger request can draw the already-decoded smaller
+                        // bitmap immediately instead of an empty box while it loads.
+                        .memoryCacheKey(memoryCacheKey)
+                        .placeholderMemoryCacheKey(placeholderMemoryCacheKey)
+                        .build(),
+                contentDescription = contentDescription,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                onState = { state = it },
+            )
 
-        when (state) {
-            is AsyncImagePainter.State.Error ->
-                GsAsyncImageErrorFallback(
-                    showLabel = showErrorLabel,
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .border(HAIRLINE_WIDTH_DP.dp, GsTheme.colorScheme.border, shape),
-                )
+            when (state) {
+                is AsyncImagePainter.State.Error ->
+                    GsAsyncImageErrorFallback(
+                        showLabel = showErrorLabel,
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .border(HAIRLINE_WIDTH_DP.dp, GsTheme.colorScheme.border, shape),
+                    )
 
-            is AsyncImagePainter.State.Loading, AsyncImagePainter.State.Empty ->
-                GsAsyncImageShimmer(
-                    modifier = Modifier.fillMaxSize(),
-                )
+                is AsyncImagePainter.State.Loading, AsyncImagePainter.State.Empty ->
+                    GsAsyncImageShimmer(
+                        modifier = Modifier.fillMaxSize(),
+                    )
 
-            is AsyncImagePainter.State.Success -> Unit
+                is AsyncImagePainter.State.Success -> Unit
+            }
         }
     }
 }

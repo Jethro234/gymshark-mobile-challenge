@@ -510,9 +510,16 @@ persistence an additive change if requirements grow.
 Algolia envelope carries far more fields than we model, and unknown-key tolerance is what
 stops an upstream addition from crashing the app).
 
-Detail screen receives **only the product id** and reads from the cached repository. A whole
-`Product` — with 7 media objects and a 2KB HTML description — must not be serialised through
-the back stack.
+Detail screen receives **the product id plus the grid card's own thumbnail** (url, width,
+height) and reads everything else from the cached repository. A whole `Product` — with 7
+media objects and a 2KB HTML description — must not be serialised through the back stack.
+
+The three thumbnail fields were added for the shared-element transition (`DESIGN.md` §6) and
+are the one deliberate exception to "id only": the detail screen's first frame is `Loading`,
+so without them the expanding hero has no image to draw. They're the same asset `media[0]`
+resolves to, so Coil serves the transition from its memory cache and nothing swaps when the
+fetch lands. Four small scalars is a different order of thing from the object graph the rule
+above exists to keep out.
 
 ### 10.1 Two behaviours that must be specified, not inferred
 
@@ -561,6 +568,16 @@ Routes are `@Serializable` keys (`data object ProductList`, `data class ProductD
 
 **Adaptive two-pane layout is cut** (see `SCOPE.md` §2 and Appendix A). Phone layout only.
 
+**Shared-element transition** (`docs/DESIGN.md` §6): `GymsharkNavHost` wraps `NavDisplay` in
+`SharedTransitionLayout`, not the other way round, and `NavDisplay` itself is given no
+`sharedTransitionScope` — that parameter exists for coordinating `sharedBounds` continuity
+across simultaneously-rendered `Scene`s, which doesn't apply to a single-pane app with one
+`Scene` on screen at a time. This follows
+`androidx.navigation3.ui.samples.SceneNavSharedElementSample` rather than the adaptive
+`SceneNavSharedEntrySample`. `@OptIn(ExperimentalSharedTransitionApi::class)` is a deliberate,
+reasoned acceptance of an experimental Jetpack API — consistent with this project's existing
+pattern of decisions-with-reasons (`explicitApi()`, no lint baseline), not scope creep.
+
 ---
 
 ## 11.2 State restoration and process death
@@ -584,9 +601,14 @@ Three separate lifetimes, handled separately rather than conflated:
   the single most common failure of this pattern, so it is explicitly tested with a
   fake repository whose cache starts empty.
 
-Because the detail screen carries **only the product id** (§10), there is nothing large to
-serialise into the saved state bundle — which is the other half of why that decision was
-taken.
+Because the detail screen carries **only the product id and its thumbnail** (§10), there is
+nothing large to serialise into the saved state bundle — which is the other half of why that
+decision was taken.
+
+- **Shared-element transition under process death**: no bespoke handling was needed.
+  `SharedTransitionScope`'s `sharedElement` is documented to render solo, gracefully, when
+  there is no matching element in the same composition pass — exactly the case when the
+  detail route is entered with no grid screen having ever been composed. See `DESIGN.md` §6.
 
 ---
 

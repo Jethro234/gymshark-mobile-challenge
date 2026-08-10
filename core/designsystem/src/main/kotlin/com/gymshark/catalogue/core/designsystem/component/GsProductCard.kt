@@ -41,6 +41,8 @@ public fun GsProductCard(
     colourway: String,
     price: String,
     modifier: Modifier = Modifier,
+    imageModifier: Modifier = Modifier,
+    imageMemoryCacheKey: String? = null,
     compareAtPrice: String? = null,
     badgeText: String? = null,
     badgeTier: GsLabelTier = GsLabelTier.Informational,
@@ -54,7 +56,8 @@ public fun GsProductCard(
                 contentWidth = imageWidth,
                 contentHeight = imageHeight,
                 shape = GsTheme.shapes.card,
-                modifier = Modifier.fillMaxWidth(),
+                memoryCacheKey = imageMemoryCacheKey,
+                modifier = Modifier.fillMaxWidth().then(imageModifier),
             )
             if (badgeText != null) {
                 GsLabelBadge(

@@ -91,6 +91,8 @@ dependencies {
     add("implementation", libs.findLibrary("compose-ui").get())
     add("implementation", libs.findLibrary("compose-ui-graphics").get())
     add("implementation", libs.findLibrary("compose-material3").get())
+    // GymsharkNavHost.kt — SharedTransitionLayout for the grid-to-detail hero transition.
+    add("implementation", libs.findLibrary("compose-animation").get())
     add("implementation", libs.findLibrary("compose-ui-tooling-preview").get())
     add("debugImplementation", libs.findLibrary("compose-ui-tooling").get())
 

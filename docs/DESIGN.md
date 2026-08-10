@@ -269,11 +269,46 @@ button is worse than no button.
 
 - Image crossfade on load: 200ms.
 - Predictive back, which Navigation 3 supports natively.
+- **Shared-element transition, now built** (`@OptIn(ExperimentalSharedTransitionApi::class)`,
+  `ARCHITECTURE.md` §11). Tapping a grid product expands its image smoothly into the detail
+  screen's hero position; the rest of the detail content fades in once it lands.
 
-**Shared-element transition is cut.** It was never in `SCOPE.md`'s build order or its 20
-hours, and it conflicts with `ARCHITECTURE.md` §11.2: after process death the detail screen
-opens in `Loading` with no image to land on, so the transition would need a fallback path
-that costs more than the effect is worth here.
+  This reverses the entry below, which is kept rather than deleted because the reasoning
+  that led to it is still real reasoning. It was originally cut for two reasons: never in
+  `SCOPE.md`'s 20-hour build order, and a conflict with `ARCHITECTURE.md` §11.2 — after
+  process death the detail screen opens in `Loading` with no image to land on, so the
+  transition would need a fallback path that costs more than the effect is worth. Verified
+  during implementation that the second objection was broader than stated:
+  `ProductDetailViewModel` renders `Loading` on the very first frame of *every* navigation
+  into the screen, not only after process death, since the repository call always yields at
+  least one frame even on a warm cache hit. The fix generalises past the original objection:
+  the hero image is hoisted above `when (uiState)` in `ProductDetailScreen`, so it exists on
+  frame one regardless of state, and the no-match case (process death, a deep link straight
+  into the detail route) is `SharedTransitionScope`'s own documented graceful default — it
+  renders solo rather than erroring — so no bespoke fallback path was needed after all.
+  - **Side effect, deliberately accepted:** the hero image is now pinned above the scrolling
+    content instead of scrolling away with it, since it has to survive `Loading` → `Content`
+    without being torn down (which would lose its shared-element identity mid-transition).
+  - "Remaining details" (title, price, sizes, description) fade in once
+    `SharedTransitionScope.isTransitionActive` flips true then back to false, guarded by a
+    750ms timeout (`SHARED_ELEMENT_MATCH_TIMEOUT_MILLIS`) for the no-match case, followed by
+    a 300ms fade (`DETAILS_FADE_DURATION_MILLIS`). A `rememberSaveable` flag with a
+    short-circuit prevents this from re-running on a rotation, where no transition ever
+    starts (`ARCHITECTURE.md` §11.2).
+  - The detail route carries the grid card's thumbnail (url + dimensions) alongside the
+    product id (`ARCHITECTURE.md` §10). Without it the hero has nothing to draw on its first
+    frame and the whole expansion plays out over an empty box — and its aspect ratio would
+    settle visibly once the real dimensions arrived. Both are the same asset, so Coil serves
+    the transition from memory and nothing swaps when the fetch lands.
+  - `GsAsyncImage` takes an explicit `isLoading` flag rather than inferring "not loaded yet"
+    from a null model: Coil treats null request data as an immediate failure, so the hero
+    flashed the error placeholder mid-transition until this was made explicit.
+  - The grid card pins its decoded bitmap under a **size-independent memory cache key** (the
+    image url) and the hero reads it back via `placeholderMemoryCacheKey`. Coil's default key
+    folds in the resolved display size, so the half-width grid thumbnail is a cache *miss* for
+    the full-width hero — and with the disk cache cut (Appendix A), that miss is a network
+    round trip. The symptom was precise: the expansion was empty on a product's first visit
+    and instant on every visit after, because only then was a hero-sized entry in memory.
 - Nothing else. No staggered list entrance animations — they look impressive in a demo and
   cost frames on every scroll, which conflicts with the performance goals.
 

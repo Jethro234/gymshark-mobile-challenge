@@ -21,6 +21,7 @@ dependencies {
     add("implementation", libs.findLibrary("navigation3-runtime").get())
     add("implementation", libs.findLibrary("navigation3-ui").get())
     add("implementation", libs.findLibrary("lifecycle-viewmodel-navigation3").get())
+    add("implementation", libs.findLibrary("compose-animation").get())
 
     add("implementation", libs.findLibrary("kotlinx-collections-immutable").get())
 

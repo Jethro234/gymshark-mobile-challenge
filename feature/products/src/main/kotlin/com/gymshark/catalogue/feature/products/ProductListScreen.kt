@@ -1,6 +1,9 @@
 package com.gymshark.catalogue.feature.products
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +34,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.gymshark.catalogue.core.designsystem.component.GsEyebrowText
 import com.gymshark.catalogue.core.designsystem.component.GsLabelTier
 import com.gymshark.catalogue.core.designsystem.component.GsProductCard
@@ -41,9 +45,11 @@ import com.gymshark.catalogue.core.model.ErrorCause
  * Stateful entry point — resolves the ViewModel and restores grid scroll position across
  * navigation and process death.
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ProductListScreen(
-    onProductClick: (String) -> Unit,
+    onProductClick: (productId: String, imageUrl: String?, imageWidth: Int?, imageHeight: Int?) -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
     modifier: Modifier = Modifier,
     viewModel: ProductListViewModel = hiltViewModel(),
 ) {
@@ -54,17 +60,20 @@ fun ProductListScreen(
         uiState = uiState,
         gridState = gridState,
         onProductClick = onProductClick,
+        sharedTransitionScope = sharedTransitionScope,
         onRefresh = viewModel::refresh,
         onRetry = viewModel::retry,
         modifier = modifier,
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 internal fun ProductListScreen(
     uiState: ProductListUiState,
     gridState: LazyGridState,
-    onProductClick: (String) -> Unit,
+    onProductClick: (productId: String, imageUrl: String?, imageWidth: Int?, imageHeight: Int?) -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -78,17 +87,20 @@ internal fun ProductListScreen(
                 state = uiState,
                 gridState = gridState,
                 onProductClick = onProductClick,
+                sharedTransitionScope = sharedTransitionScope,
                 onRefresh = onRefresh,
                 modifier = modifier,
             )
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun ContentState(
     state: ProductListUiState.Content,
     gridState: LazyGridState,
-    onProductClick: (String) -> Unit,
+    onProductClick: (productId: String, imageUrl: String?, imageWidth: Int?, imageHeight: Int?) -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -131,19 +143,37 @@ private fun ContentState(
                 key = { it.id },
                 contentType = { "product" },
             ) { product ->
-                GsProductCard(
-                    imageUrl = product.imageUrl,
-                    imageAlt = product.imageAlt,
-                    imageWidth = product.imageWidth,
-                    imageHeight = product.imageHeight,
-                    title = product.title,
-                    colourway = product.colourway,
-                    price = product.price,
-                    compareAtPrice = product.compareAtPrice,
-                    badgeText = product.badgeText,
-                    badgeTier = product.badgeTier ?: GsLabelTier.Informational,
-                    onClick = { onProductClick(product.id) },
-                )
+                with(sharedTransitionScope) {
+                    GsProductCard(
+                        imageUrl = product.imageUrl,
+                        imageAlt = product.imageAlt,
+                        imageWidth = product.imageWidth,
+                        imageHeight = product.imageHeight,
+                        title = product.title,
+                        colourway = product.colourway,
+                        price = product.price,
+                        compareAtPrice = product.compareAtPrice,
+                        badgeText = product.badgeText,
+                        badgeTier = product.badgeTier ?: GsLabelTier.Informational,
+                        // Lets the detail screen's larger hero draw this exact bitmap while
+                        // its own full-width request loads (docs/DESIGN.md §6).
+                        imageMemoryCacheKey = product.imageUrl,
+                        imageModifier =
+                            Modifier.sharedElement(
+                                rememberSharedContentState(key = product.id),
+                                animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                                boundsTransform = { _, _ -> tween(HERO_TRANSFORM_DURATION_MILLIS) },
+                            ),
+                        onClick = {
+                            onProductClick(
+                                product.id,
+                                product.imageUrl,
+                                product.imageWidth,
+                                product.imageHeight,
+                            )
+                        },
+                    )
+                }
             }
         }
     }
