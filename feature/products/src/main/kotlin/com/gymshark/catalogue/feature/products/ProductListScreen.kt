@@ -3,7 +3,6 @@ package com.gymshark.catalogue.feature.products
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -162,7 +161,7 @@ private fun ContentState(
                             Modifier.sharedElement(
                                 rememberSharedContentState(key = product.id),
                                 animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-                                boundsTransform = { _, _ -> tween(HERO_TRANSFORM_DURATION_MILLIS) },
+                                boundsTransform = HeroBoundsTransform,
                             ),
                         onClick = {
                             onProductClick(

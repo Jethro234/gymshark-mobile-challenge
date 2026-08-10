@@ -54,16 +54,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
- * The hero image's own bounds-transform duration, overriding the shared-element API's default
- * (a `spring(stiffness = StiffnessMediumLow)`, whose settle time is neither fixed nor fast —
- * it was the main source of "everything feels slow" before this was pinned down explicitly).
- * `internal`, not `private`, because `ProductListScreen`'s grid-side `sharedElement` call uses
- * the same value — both sides of a match should agree on one transform, not risk disagreeing
- * on whichever side's `boundsTransform` the API happens to prefer.
- */
-internal const val HERO_TRANSFORM_DURATION_MILLIS = 350
-
-/**
  * How long to wait for a shared-element transition to start before giving up on it — covers
  * navigation with no grid counterpart to match (process death, a deep link straight into this
  * screen). Sized just above [HERO_TRANSFORM_DURATION_MILLIS] itself, now that duration is a
@@ -214,7 +204,7 @@ private fun HeroImage(
                     Modifier.fillMaxWidth().sharedElement(
                         rememberSharedContentState(key = productId),
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-                        boundsTransform = { _, _ -> tween(HERO_TRANSFORM_DURATION_MILLIS) },
+                        boundsTransform = HeroBoundsTransform,
                     ),
             )
             if (badgeText != null) {

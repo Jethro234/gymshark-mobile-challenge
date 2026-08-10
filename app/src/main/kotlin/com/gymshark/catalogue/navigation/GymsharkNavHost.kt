@@ -1,7 +1,11 @@
 package com.gymshark.catalogue.navigation
 
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -9,8 +13,19 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.gymshark.catalogue.feature.products.PRODUCT_DETAIL_EXIT_DURATION_MILLIS
 import com.gymshark.catalogue.feature.products.ProductDetailScreen
 import com.gymshark.catalogue.feature.products.ProductListScreen
+
+/**
+ * Both directions of the pop use one spec, so a gesture-driven back and a button-driven back
+ * sequence against the hero transform identically.
+ */
+private val PRODUCT_DETAIL_POP_TRANSITION =
+    ContentTransform(
+        fadeIn(tween(PRODUCT_DETAIL_EXIT_DURATION_MILLIS)),
+        fadeOut(tween(PRODUCT_DETAIL_EXIT_DURATION_MILLIS)),
+    )
 
 /**
  * The app's only navigation graph — two routes (docs/ARCHITECTURE.md §11). Both entry
@@ -35,6 +50,15 @@ fun GymsharkNavHost(modifier: Modifier = Modifier) {
         NavDisplay(
             backStack = backStack,
             onBack = { backStack.removeLastOrNull() },
+            // NavDisplay's default pop is a 700ms crossfade, more than twice the hero's own
+            // transform — so on the way back the detail content was still fading long after
+            // the image had finished shrinking into its grid cell. Popping quickly instead
+            // lets HeroBoundsTransform hold the image still until that fade is done and then
+            // shrink it (docs/DESIGN.md §6). The predictive spec is overridden for the same
+            // reason and because its default scales the whole outgoing scene, which fights
+            // the shared element rather than complementing it.
+            popTransitionSpec = { PRODUCT_DETAIL_POP_TRANSITION },
+            predictivePopTransitionSpec = { PRODUCT_DETAIL_POP_TRANSITION },
             entryDecorators =
                 listOf(
                     rememberSaveableStateHolderNavEntryDecorator(),

@@ -289,12 +289,24 @@ button is worse than no button.
   - **Side effect, deliberately accepted:** the hero image is now pinned above the scrolling
     content instead of scrolling away with it, since it has to survive `Loading` → `Content`
     without being torn down (which would lose its shared-element identity mid-transition).
-  - "Remaining details" (title, price, sizes, description) fade in once
-    `SharedTransitionScope.isTransitionActive` flips true then back to false, guarded by a
-    750ms timeout (`SHARED_ELEMENT_MATCH_TIMEOUT_MILLIS`) for the no-match case, followed by
-    a 300ms fade (`DETAILS_FADE_DURATION_MILLIS`). A `rememberSaveable` flag with a
-    short-circuit prevents this from re-running on a rotation, where no transition ever
-    starts (`ARCHITECTURE.md` §11.2).
+  - **Going in**, the image leads and "remaining details" (title, price, sizes, description)
+    follow: they fade in once `SharedTransitionScope.isTransitionActive` flips true then back
+    to false, guarded by a 500ms timeout (`SHARED_ELEMENT_MATCH_TIMEOUT_MILLIS`) for the
+    no-match case, followed by a 200ms fade (`DETAILS_FADE_DURATION_MILLIS`). A
+    `rememberSaveable` flag with a short-circuit prevents this from re-running on a rotation,
+    where no transition ever starts (`ARCHITECTURE.md` §11.2).
+  - **Going back, the order reverses**: the details clear first, then the image shrinks. The
+    hero transform is 350ms (`HERO_TRANSFORM_DURATION_MILLIS`) against `NavDisplay`'s 700ms
+    default pop, so the content was still fading long after the image had landed. The pop is
+    now a 120ms fade (`PRODUCT_DETAIL_EXIT_DURATION_MILLIS`) and the shrink is delayed by the
+    same amount. `BoundsTransform` receives the bounds it is animating between, so growing and
+    shrinking are told apart from the geometry alone — no navigation state is threaded into
+    the design system to ask "which way am I going". Predictive back is overridden with the
+    same spec; its default scales the whole outgoing scene, which fights a shared element
+    that is already shrinking.
+  - Both sides of the match — grid card and detail hero — read one `BoundsTransform` from
+    `ProductSharedTransition.kt`. When each declared its own, which one applied depended on
+    which side the API happened to read.
   - The detail route carries the grid card's thumbnail (url + dimensions) alongside the
     product id (`ARCHITECTURE.md` §10). Without it the hero has nothing to draw on its first
     frame and the whole expansion plays out over an empty box — and its aspect ratio would
