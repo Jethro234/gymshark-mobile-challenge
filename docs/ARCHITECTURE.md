@@ -643,7 +643,7 @@ applies to a take-home:
 |---|---|---|
 | **Field monitoring** — what users actually experience; drives prioritisation | Play Console Android Vitals (slow frames >16ms, frozen frames >700ms — Play can demote discoverability for breaching thresholds), plus RUM via Firebase Performance / New Relic / Sentry | **No.** No users. |
 | **Regression prevention** — did this change make it worse? | Macrobenchmark in CI as a *differential* gate on pinned hardware | **No.** Single contributor, ~30 commits. A trend line needs a trend. |
-| **Investigation** — why is this specific thing slow? | Perfetto trace, one-off | **Yes.** This is the loop that demonstrates skill. |
+| **Investigation** — why is this specific thing slow? | Macrobenchmark output, one-off | **Yes.** This is the loop that demonstrates skill. |
 
 A trend dashboard on a repository with one contributor is scaffolding for a process with
 nothing to process, and an experienced reviewer may read it as not understanding why the
@@ -664,11 +664,6 @@ are noise and are not published.
   give roughly **30% faster code execution from first launch** by letting ART compile the
   profiled paths AOT instead of interpreting and JIT-ing them. For a scroll-heavy list app
   this is the single largest lever.
-- **Perfetto traces** — Macrobenchmark emits `.perfetto-trace` files alongside
-  `benchmarkData.json` automatically. Two are committed to the repo (before and after one
-  specific fix) with instructions to open them at `ui.perfetto.dev`. Note that Perfetto's
-  UI is a client-side viewer: traces are processed locally in the browser and are not
-  uploaded anywhere.
 
 ### 14.3 Design decisions taken *for* performance, not retrofitted
 
@@ -737,5 +732,5 @@ following is to be built.** See `SCOPE.md` for the 20-hour budget that drove eac
 | **Robolectric UI-test layer** | JVM-hosted Compose tests as the bulk of UI coverage | Paparazzi covers rendering, unit tests cover behaviour; the middle layer was the affordable loss |
 | **Colourway grouping** | One card per title with colour swatches; the sixty hits are twenty-one products | Would mean inventing a product model the search API does not express |
 | **Disk cache** | Room or Coil disk persistence for offline first launch | Schema, DAOs and migrations for ten products that never change |
-| **Perfetto investigation write-up** | A found-and-fixed jank source with before/after traces | Requires a real defect to find; Baseline Profile before/after numbers are kept |
+| **Trace-based investigation write-up** | A found-and-fixed jank source with before/after traces | Requires a real defect to find; Baseline Profile before/after numbers are kept |
 | **CI Macrobenchmark** | Benchmarks as a regression gate in GitHub Actions | No physical devices on hosted runners; emulator figures too noisy to gate on |

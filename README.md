@@ -180,8 +180,8 @@ improve measurably: median `timeToInitialDisplayMs` went from 173.08 ms to 159.2
 renders, not just the loading spinner's first frame — from 445.19 ms to 422.43 ms
 (-5.1%), both with the profile applied.
 
-Full method, the measure → diagnose → fix → re-measure write-up, and the committed Perfetto
-traces are in [PERFORMANCE.md](docs/PERFORMANCE.md).
+Full method and the measure → diagnose → fix → re-measure write-up are in
+[PERFORMANCE.md](docs/PERFORMANCE.md).
 
 ---
 
@@ -239,7 +239,7 @@ snapshot layer exists to pin either), both on a physical device rather than an e
 |---|---|
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Module structure, DI, state modelling, data layer, navigation, testing strategy, state restoration — each decision with its rejected alternatives |
 | [DESIGN.md](docs/DESIGN.md) | Colour and type tokens, component specs, accessibility, what replaced the snapshot-testing layer |
-| [PERFORMANCE.md](docs/PERFORMANCE.md) | Benchmark method, results, Perfetto traces, what production monitoring would look like |
+| [PERFORMANCE.md](docs/PERFORMANCE.md) | Benchmark method, results, what production monitoring would look like |
 | [CONVENTIONS.md](docs/CONVENTIONS.md) | Git strategy, build setup, static analysis, code style |
 
 Each records not just what was chosen but what was rejected, and why.

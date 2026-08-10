@@ -43,7 +43,7 @@ Removed from scope now, not abandoned halfway. Each is one README line under "ne
 | **Adaptive `ListDetailPaneScaffold`** | Genuinely valuable, genuinely 3–4 hours with its goldens and device checks. First thing to go on a 20-hour budget. |
 | **Colourway grouping** | Sixty hits are twenty-one products in sixty colours. Shipping flat is what Algolia returns and is defensible; grouping is a new product model plus swatch state plus tests. **One README line noting it was spotted** converts an apparent oversight into visible judgement at zero cost. |
 | **Robolectric UI test layer** | Paparazzi covers rendering; two instrumented tests cover navigation. The middle layer is the affordable loss. |
-| **Perfetto investigation write-up** | Requires finding a real jank source to fix. Keep the Baseline Profile before/after numbers, drop the narrative. |
+| **Trace-based investigation write-up** | Requires finding a real jank source to fix. Keep the Baseline Profile before/after numbers, drop the narrative. |
 | **Eight modules → six** | Merge `:core:network` into `:core:data`, and `:feature:productlist` + `:feature:productdetail` into `:feature:products`. The boundary argument survives intact; four fewer build files do not need writing. |
 
 **Final structure:** `:app` · `:core:model` · `:core:data` · `:core:designsystem` ·

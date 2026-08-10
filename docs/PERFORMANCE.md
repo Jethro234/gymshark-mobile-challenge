@@ -129,19 +129,12 @@ before/after fix to report here — writing one up would mean inventing a bug th
 measurement did not find, which the warning at the top of this document exists specifically
 to prevent.
 
-Two representative traces are committed under `docs/traces/` as evidence for the headline
-numbers rather than as a before/after pair:
-
-- `docs/traces/scroll-no-compilation.perfetto-trace`
-- `docs/traces/scroll-baseline-profile.perfetto-trace`
-
-> To inspect: open <https://ui.perfetto.dev> and drag the file in. Traces are processed
-> locally in your browser — nothing is uploaded.
+The §3 numbers themselves — `FrameTimingMetric`/`StartupTimingMetric` output from
+`:macrobenchmark` — are the evidence; no separate trace artefact is kept alongside them.
 
 If a future change to the product grid (heavier per-item composition, more images in
 flight, a longer list) reintroduces real jank, this is the section to fill in properly:
-capture a fresh before/after trace pair, diagnose on the UI thread timeline, fix, and
-re-measure.
+capture a fresh before/after trace, diagnose on the UI thread timeline, fix, and re-measure.
 
 ---
 

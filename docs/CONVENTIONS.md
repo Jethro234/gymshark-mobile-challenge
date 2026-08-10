@@ -66,10 +66,9 @@ Scopes match the six-module structure: `model` · `data` · `designsystem` · `t
 ### `.gitignore`
 
 Standard Android ignores, plus `local.properties`, `.idea/` except code style files, and
-most Macrobenchmark output. **The generated Baseline Profile and two representative Perfetto
-traces are committed deliberately** (`app/src/release/generated/baselineProfiles/`,
-`docs/traces/`) — they are evidence, not build output. There is no snapshot-testing layer
-(§2), so no goldens directory exists to reason about here.
+most Macrobenchmark output. **The generated Baseline Profile is committed deliberately**
+(`app/src/release/generated/baselineProfiles/`) — it is evidence, not build output. There is
+no snapshot-testing layer (§2), so no goldens directory exists to reason about here.
 
 ---
 

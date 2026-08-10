@@ -18,11 +18,9 @@ captures/
 !.idea/codeStyles/
 !.idea/codeStyles/**
 
-# Macrobenchmark output (docs/CONVENTIONS.md §1) — Perfetto traces are
-# committed deliberately when curated as evidence, not as raw build output.
+# Macrobenchmark output (docs/CONVENTIONS.md §1) — none of it is committed.
 outputs/connected_android_test_additional_output/
 *.perfetto-trace
-!docs/traces/*.perfetto-trace
 
 # Paparazzi/Compose compiler reports — generated, not evidence
 build/reports/paparazzi/
