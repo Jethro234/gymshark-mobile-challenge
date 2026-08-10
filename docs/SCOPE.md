@@ -143,6 +143,7 @@ Deferred work, stated as choices with reasons — not a list of things that didn
 - Colourway grouping: the sixty hits are twenty-one products in sixty colours, and `handle`
   encodes it. Shipped flat because that is what the search endpoint returns; grouping would
   mean inventing a product model the API doesn't express.
-- Disk cache for offline first launch.
+- Payload persistence for offline first launch. (Coil's image disk cache is enabled — it is
+  the response body, not the artwork, that an offline first launch would need.)
 - Field performance monitoring — Play Vitals plus RUM attribution — which is what this
   tooling is actually for at production scale.

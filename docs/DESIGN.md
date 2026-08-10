@@ -306,8 +306,10 @@ button is worse than no button.
   - The grid card pins its decoded bitmap under a **size-independent memory cache key** (the
     image url) and the hero reads it back via `placeholderMemoryCacheKey`. Coil's default key
     folds in the resolved display size, so the half-width grid thumbnail is a cache *miss* for
-    the full-width hero — and with the disk cache cut (Appendix A), that miss is a network
-    round trip. The symptom was precise: the expansion was empty on a product's first visit
+    the full-width hero. That miss was a full network round trip when first diagnosed, since
+    the image disk cache was still disabled at the time; enabling it (`ARCHITECTURE.md` §12)
+    shortens the miss but does not remove it, so the key still matters. The symptom was
+    precise: the expansion was empty on a product's first visit
     and instant on every visit after, because only then was a hero-sized entry in memory. The
     card reads the same key back as well as writing it, because `NavDisplay` recomposes the
     list from scratch on back navigation — without it the shrinking hero lands on a card that

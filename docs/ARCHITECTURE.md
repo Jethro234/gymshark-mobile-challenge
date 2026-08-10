@@ -638,6 +638,19 @@ of the argument for having a wrapper.
 - `contentDescription` from `alt` where present, falling back to the product title —
   `alt` is `null` throughout this payload, so the fallback is the real path.
 
+**One `ImageLoader`, built in `GymsharkApplication`** via `SingletonImageLoader.Factory`, off
+the same `OkHttpClient` Retrofit uses — otherwise Coil quietly constructs its own and the app
+runs two disconnected connection pools.
+
+- **Coil's default disk cache is enabled.** The photos are large and immutable, and each is
+  fetched at two sizes (grid thumbnail, detail hero), so without it every cold start
+  re-downloads unchanged artwork. This is images only; the Algolia response is still not
+  persisted, so an offline first launch remains an error state (Appendix A).
+- **Memory cache keys are pinned for the shared-element transition.** Coil's default key
+  folds in the resolved display size, making the grid thumbnail a miss for the hero; the card
+  writes and reads a size-independent key so the hero can borrow its bitmap. See
+  `DESIGN.md` §6.
+
 ---
 
 ## 13. UI direction
@@ -753,6 +766,6 @@ following is to be built.** See `SCOPE.md` for the 20-hour budget that drove eac
 | **Adaptive two-pane layout** | `ListDetailPaneScaffold` on `WindowSizeClass`, list and detail side by side on tablets and unfolded foldables | Genuinely valuable and genuinely 3–4 hours with goldens and device verification |
 | **Robolectric UI-test layer** | JVM-hosted Compose tests as the bulk of UI coverage | Paparazzi covers rendering, unit tests cover behaviour; the middle layer was the affordable loss |
 | **Colourway grouping** | One card per title with colour swatches; the sixty hits are twenty-one products | Would mean inventing a product model the search API does not express |
-| **Disk cache** | Room or Coil disk persistence for offline first launch | Schema, DAOs and migrations for ten products that never change |
+| **Payload persistence** | Room or an HTTP cache holding the Algolia response, for offline first launch | Schema, DAOs and migrations for ten products that never change. **Coil's image disk cache was later enabled** (§12) — that covers artwork across cold starts, not the response body an offline first launch needs, so this row stands |
 | **Trace-based investigation write-up** | A found-and-fixed jank source with before/after traces | Requires a real defect to find; Baseline Profile before/after numbers are kept |
 | **CI Macrobenchmark** | Benchmarks as a regression gate in GitHub Actions | No physical devices on hosted runners; emulator figures too noisy to gate on |

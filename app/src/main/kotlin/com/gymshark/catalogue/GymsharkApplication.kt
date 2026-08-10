@@ -29,10 +29,11 @@ class GymsharkApplication :
         ImageLoader
             .Builder(context)
             .components { add(OkHttpNetworkFetcherFactory(callFactory = okHttpClient)) }
-            // Coil enables a disk cache by default. README.md / ARCHITECTURE.md Appendix A
-            // both name "disk cache, for offline first launch" as a deliberate cut — disabled
-            // explicitly so that decision is real rather than an accidental side effect of
-            // never having configured an ImageLoader at all.
-            .diskCache(null)
+            // Coil's default disk cache is left in place deliberately: the product photos are
+            // large, immutable, and each one is fetched at two different sizes (grid
+            // thumbnail, then detail hero), so without it every cold start re-downloads
+            // artwork that has not changed. This is image caching only — the Algolia payload
+            // itself is still not persisted, so a first launch with no connection remains an
+            // error state (README.md, "next steps").
             .build()
 }

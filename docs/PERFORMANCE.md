@@ -61,6 +61,11 @@ now builds Coil's `ImageLoader` off the same `OkHttpClient` Retrofit uses, rathe
 silently constructing its own. The Baseline Profile was regenerated against the current
 build before this run.
 
+**These figures predate two later image-loading changes** — Coil's disk cache was enabled and
+the grid/hero memory cache keys were pinned (`ARCHITECTURE.md` §12). Both reduce image work
+rather than add it, so the scroll numbers should if anything improve, but they have not been
+re-measured on a physical device and are not claimed to cover the current build.
+
 ---
 
 ## 3. Headline result — Baseline Profile impact

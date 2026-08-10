@@ -157,7 +157,9 @@ Choices with reasons, not a list of unfinished work:
   swatches would mean inventing a product model the API does not express.
 - **Adaptive two-pane layout** for tablets and foldables. Navigation 3 makes this
   inexpensive; omitted for time rather than for doubt.
-- **Disk cache**, so a first launch while offline shows content rather than an error state.
+- **Payload persistence**, so a first launch while offline shows content rather than an error
+  state. Coil's *image* disk cache is enabled, so artwork survives a cold start; the Algolia
+  response itself is not persisted, which is what an offline first launch would need.
 - **Field performance monitoring** — Play Vitals plus RUM attribution by screen and device
   tier, which is what this tooling is for at production scale.
 
