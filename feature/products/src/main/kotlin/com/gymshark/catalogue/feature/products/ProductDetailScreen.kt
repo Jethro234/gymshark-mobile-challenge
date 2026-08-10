@@ -139,7 +139,7 @@ internal fun ProductDetailScreen(
                 imageWidth = heroWidth,
                 imageHeight = heroHeight,
                 // Only a genuine "nothing to draw yet" — a resolved product with no image at
-                // all must fall through to the error placeholder, not shimmer forever.
+                // all must fall through to the error fallback, not sit on a blank fill forever.
                 isLoading = heroUrl == null && content == null,
                 contentDescription = selectedMedia?.alt ?: content?.product?.title,
                 badgeText = content?.product?.badgeText,

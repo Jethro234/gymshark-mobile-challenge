@@ -161,7 +161,10 @@ Why this shape:
   criticised.
 - **`when` is exhaustive**, so adding a state is a compile error at every call site rather
   than a silent blank screen.
-- **Each branch is independently snapshot-testable** — one Paparazzi golden per state.
+- **Each branch is independently renderable from a constructed state**, which is what the
+  planned snapshot layer would have exercised one golden at a time. No snapshot layer was
+  built (see the erratum at the top of this document), so this is a property of the design
+  rather than something currently under test.
 - **`ErrorCause` is typed**, so the UI can distinguish "you're offline" from "we broke",
   which is the difference between an error state and an apology. `Throwable` in state is
   a leak of the data layer into the UI.
@@ -618,10 +621,15 @@ decision was taken.
 not a replacement for it. The wrapper exists because Coil's built-in `placeholder`/`error`
 parameters take *painters*, and none of the following can be expressed as a painter:
 
-- A **composed** error fallback (brand surface, mark, product initial) rather than a grey box.
+- A **composed** error fallback (surface fill, broken-image icon, "Image unavailable"
+  caption) rather than a grey box — and the caption suppressed at thumbnail sizes, where it
+  would wrap over the icon.
 - An aspect ratio reserved from the payload's `width`/`height` before load.
 - A `contentDescription` fallback from title when `alt` is null (which it is, on every product).
-- A single deterministic seam for Paparazzi to force the loading and error states.
+- A single deterministic seam for forcing the loading and error states. This was written for
+  the planned snapshot layer, which was never built (see the erratum at the top of this
+  document); the seam still earns its place as the thing that keeps state handling in one
+  place rather than repeated at each call site.
 
 **`AsyncImage` with an `AsyncImagePainter` state listener — explicitly not
 `SubcomposeAsyncImage`.** Subcomposition is measurably more expensive in a scrolling grid,
@@ -629,12 +637,13 @@ and given the performance goals in §14 this is designed in from the start rathe
 measured out later. The wrapper's public API is identical either way, which is itself part
 of the argument for having a wrapper.
 
-- **Three distinct visual states**: shimmer placeholder while loading, a branded error
-  fallback (icon plus product initial — not a grey box), and the image.
+- **Three distinct visual states**: a flat `surface` placeholder while loading, an error
+  fallback (broken-image icon plus caption — not a grey box), and the image.
 - **Aspect ratio reserved from the payload's `width`/`height`** before load, so the grid
   never jumps.
-- `crossfade` for perceived smoothness; explicit **size hints** so a 1692×2018 JPEG is not
-  decoded at full resolution into a grid cell.
+- `crossfade` for perceived smoothness. Sizing is left to **Coil's constraint-based
+  resolution** rather than `Size.ORIGINAL`, so a 1692×2018 JPEG is decoded to the cell it is
+  drawn into. No explicit size is passed — the constraints already carry it.
 - `contentDescription` from `alt` where present, falling back to the product title —
   `alt` is `null` throughout this payload, so the fallback is the real path.
 
@@ -713,8 +722,8 @@ are noise and are not published.
   than `List`, so Compose can skip recomposition instead of assuming instability.
 - Image aspect ratio reserved from payload `width`/`height` — no layout jump, no
   re-measure pass mid-scroll.
-- Explicit Coil size hints so a 1692×2018 JPEG is not decoded at full resolution into a
-  grid cell.
+- Coil's constraint-based size resolution, not `Size.ORIGINAL`, so a 1692×2018 JPEG is not
+  decoded at full resolution into a grid cell.
 - R8 full mode enabled on release.
 
 ### 14.4 Compose compiler stability reports

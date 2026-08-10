@@ -176,8 +176,8 @@ finding before this report ran.
   assume instability.
 - Image aspect ratio reserved from the payload's `width`/`height`, so the grid never
   re-measures mid-scroll.
-- Explicit Coil size hints — a 1692×2018 source JPEG is never decoded at full resolution
-  into a grid cell.
+- Coil's constraint-based size resolution rather than `Size.ORIGINAL` — a 1692×2018 source
+  JPEG is never decoded at full resolution into a grid cell.
 - R8 full mode on release.
 
 ---

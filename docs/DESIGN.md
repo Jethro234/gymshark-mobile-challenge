@@ -135,7 +135,11 @@ Wraps Coil 3 `AsyncImage` (not `SubcomposeAsyncImage` — see `ARCHITECTURE.md` 
 
 Three states share **one shape instance**:
 
-- **Loading** — `surface` fill, subtle shimmer.
+- **Loading** — flat `surface` fill. A shimmer was specified here and built, but it animated
+  a `surface`-coloured box over a `surface`-coloured parent: identical colours, so alpha
+  blending produced no visible change on any device. It was removed rather than left in —
+  it cost a recomposition every animation frame and rendered nothing. A real shimmer needs a
+  contrasting tint or a gradient sweep, which is a design decision that has not been taken.
 - **Loaded** — the image, `ContentScale.Crop`.
 - **Error** — `surface` fill, 0.5dp `border`, `ti-photo-off` equivalent icon in `textDisabled`,
   caption "Image unavailable" in `textMuted`.
@@ -325,11 +329,11 @@ button is worse than no button.
     and instant on every visit after, because only then was a hero-sized entry in memory. The
     card reads the same key back as well as writing it, because `NavDisplay` recomposes the
     list from scratch on back navigation — without it the shrinking hero lands on a card that
-    has restarted at a shimmer.
-  - `GsAsyncImage` draws its shimmer as an *overlay*, so it is now conditional on there being
-    nothing underneath: Coil supplies a painter the moment `placeholderMemoryCacheKey`
-    resolves, and painting the shimmer over it regardless is what remained of the flicker
-    after the cache keys were right. Images with no placeholder key are unaffected.
+    has restarted at an empty placeholder.
+  - Nothing is drawn over the `surface` fill while loading, so Coil's own placeholder shows
+    through as soon as `placeholderMemoryCacheKey` resolves to one. An overlay painted there
+    unconditionally was what remained of the flicker after the cache keys were right — see
+    §"Image states" for why the overlay that used to sit there was removed outright.
 - Nothing else. No staggered list entrance animations — they look impressive in a demo and
   cost frames on every scroll, which conflicts with the performance goals.
 

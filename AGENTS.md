@@ -119,8 +119,8 @@ anything else requires stopping and asking.
 
 | Purpose | Dependency |
 |---|---|
-| UI | Compose BOM — **`ui-text` 1.9 or later, non-negotiable** (see `docs/ARCHITECTURE.md` §6), Material 3 |
-| Navigation | `androidx.navigation3`, `androidx.lifecycle:lifecycle-viewmodel-navigation3` |
+| UI | Compose BOM — **`ui-text` 1.9 or later, non-negotiable** (see `docs/ARCHITECTURE.md` §6), Material 3, `compose-animation` (`SharedTransitionLayout`, see `docs/DESIGN.md` §6) |
+| Navigation | `androidx.navigation3`, `androidx.lifecycle:lifecycle-viewmodel-navigation3`, `androidx.activity:activity-compose` |
 | DI | Hilt + `hilt-navigation-compose`, processed via **KSP** |
 | Network | Retrofit, OkHttp, `kotlinx-serialization-json`, Retrofit kotlinx-serialization converter |
 | Images | Coil 3 (`coil-compose`, `coil-network-okhttp`) |

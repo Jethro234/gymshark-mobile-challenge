@@ -58,8 +58,8 @@ public fun GsProductCard(
                 shape = GsTheme.shapes.card,
                 // Written *and* read back under the same key: writing lets the detail hero
                 // borrow this bitmap, reading lets the card redraw instantly when the list is
-                // recomposed from scratch on back navigation, rather than restarting at a
-                // shimmer while the shrinking hero lands on it.
+                // recomposed from scratch on back navigation, rather than restarting at an
+                // empty placeholder while the shrinking hero lands on it.
                 memoryCacheKey = imageMemoryCacheKey,
                 placeholderMemoryCacheKey = imageMemoryCacheKey,
                 modifier = Modifier.fillMaxWidth().then(imageModifier),

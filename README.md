@@ -211,7 +211,7 @@ approximation of it.
 | Module | Line coverage |
 |---|---|
 | `:core:model` | 86.2% (100/116) |
-| `:core:data` | 98.0% (96/98) |
+| `:core:data` | 94.1% (95/101) |
 
 A gate would invite tests written to move a number rather than to catch a defect. What is
 deliberately untested — and why — is listed in [ARCHITECTURE.md](docs/ARCHITECTURE.md) §9.6.
