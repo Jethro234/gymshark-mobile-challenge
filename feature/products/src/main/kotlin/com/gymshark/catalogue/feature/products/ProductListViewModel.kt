@@ -74,11 +74,10 @@ class ProductListViewModel
 
         private fun refreshFailureState(cause: ErrorCause): ProductListUiState {
             val current = internalState.value
-            val error = ProductListUiState.Error(cause)
             return if (current is ProductListUiState.Content) {
-                current.copy(isRefreshing = false, snackBarError = error)
+                current.copy(isRefreshing = false, snackBarError = cause)
             } else {
-                error
+                ProductListUiState.Error(cause)
             }
         }
 

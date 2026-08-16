@@ -105,7 +105,7 @@ internal fun ProductListScreen(
                 modifier = modifier,
             )
             uiState.snackBarError?.let {
-                val text = stringResource(it.cause.toMessageRes())
+                val text = stringResource(it.toMessageRes())
                 LaunchedEffect(Unit) {
                     snackBarHostState.showSnackbar(text)
                     onRefreshErrorShown()
