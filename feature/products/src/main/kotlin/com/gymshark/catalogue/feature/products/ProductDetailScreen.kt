@@ -6,7 +6,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
@@ -129,7 +128,12 @@ internal fun ProductDetailScreen(
     val heroWidth = selectedMedia?.width ?: initialImageWidth
     val heroHeight = selectedMedia?.height ?: initialImageHeight
 
-    Column(modifier = modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeDrawing),
+    ) {
         BackRow(onBackClick = onBackClick)
 
         if (uiState !is ProductDetailUiState.Error) {
@@ -188,7 +192,12 @@ private fun HeroImage(
 ) {
     val spacing = GsTheme.spacing
     with(sharedTransitionScope) {
-        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = spacing.screenGutter)) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = spacing.screenGutter),
+        ) {
             GsAsyncImage(
                 model = imageUrl,
                 contentDescription = contentDescription,
@@ -201,17 +210,22 @@ private fun HeroImage(
                 // on a product's first visit (docs/DESIGN.md §6).
                 placeholderMemoryCacheKey = imageUrl,
                 modifier =
-                    Modifier.fillMaxWidth().sharedElement(
-                        rememberSharedContentState(key = productId),
-                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
-                        boundsTransform = HeroBoundsTransform,
-                    ),
+                    Modifier
+                        .fillMaxWidth()
+                        .sharedElement(
+                            rememberSharedContentState(key = productId),
+                            animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                            boundsTransform = HeroBoundsTransform,
+                        ),
             )
             if (badgeText != null) {
                 GsLabelBadge(
                     text = badgeText,
                     tier = badgeTier ?: GsLabelTier.Informational,
-                    modifier = Modifier.align(Alignment.TopStart).padding(spacing.space8 + 2.dp),
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopStart)
+                            .padding(spacing.space8 + 2.dp),
                 )
             }
         }
@@ -296,7 +310,13 @@ private fun ContentState(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .testTag(PRODUCT_DETAIL_ROOT_TAG),
+    ) {
         if (product.media.size > 1) {
             ThumbnailStrip(
                 media = product.media,
@@ -312,7 +332,11 @@ private fun ContentState(
             enter = fadeIn(tween(DETAILS_FADE_DURATION_MILLIS)),
             exit = ExitTransition.None,
         ) {
-            Column(modifier = Modifier.padding(horizontal = spacing.screenGutter)) {
+            Column(
+                modifier =
+                    Modifier
+                        .padding(horizontal = spacing.screenGutter),
+            ) {
                 Text(
                     text = product.title,
                     style = GsTheme.typography.titleProduct,
@@ -386,3 +410,5 @@ private fun DescriptionSection(
         )
     }
 }
+
+const val PRODUCT_DETAIL_ROOT_TAG = "productDetailRootTag"

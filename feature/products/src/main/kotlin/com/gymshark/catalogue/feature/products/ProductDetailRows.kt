@@ -57,7 +57,9 @@ internal fun ThumbnailStrip(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.horizontalScroll(rememberScrollState()),
+        modifier =
+            modifier
+                .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(GsTheme.spacing.space8),
     ) {
         media.forEachIndexed { index, item ->

@@ -1,7 +1,11 @@
 package com.gymshark.catalogue
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -9,11 +13,13 @@ import androidx.compose.ui.test.performScrollToIndex
 import com.gymshark.catalogue.core.testing.FakeProductRepository
 import com.gymshark.catalogue.core.testing.productFixture
 import com.gymshark.catalogue.di.TestRepositoryHolder
+import com.gymshark.catalogue.feature.products.PRODUCT_DETAIL_ROOT_TAG
 import com.gymshark.catalogue.feature.products.PRODUCT_GRID_TEST_TAG
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Rule
 import org.junit.Test
+import kotlin.collections.isNotEmpty
 
 private const val PRODUCT_COUNT = 20
 private const val SCROLLED_PRODUCT_INDEX = 15
@@ -52,21 +58,31 @@ class ProductListNavigationTest {
         waitUntilNodeWithTextExists(scrolledTitle)
 
         composeRule.onNodeWithText(scrolledTitle).performClick()
-
-        // The detail screen shows the same product's title too, so its presence confirms
-        // navigation landed on the right product.
-        waitUntilNodeWithTextExists(scrolledTitle)
+        // Product ID should be displayed in the Details screen
+        composeRule.waitUntil(WAIT_TIMEOUT_MILLIS) {
+            composeRule
+                .onAllNodes(
+                    hasText(scrolledTitle) and hasAnyAncestor(hasTestTag(PRODUCT_DETAIL_ROOT_TAG)),
+                ).fetchSemanticsNodes()
+                .isNotEmpty()
+        }
 
         composeRule.activity.onBackPressedDispatcher.onBackPressed()
 
-        // Back on the list, still scrolled — the item scrolled to before navigating is
-        // visible again without scrolling, which only holds if the position was restored.
-        waitUntilNodeWithTextExists(scrolledTitle)
+        waitUntilNodeWithTagExists(PRODUCT_GRID_TEST_TAG)
+
+        composeRule.onNodeWithText(scrolledTitle).assertIsDisplayed()
     }
 
     private fun waitUntilNodeWithTextExists(text: String) {
         composeRule.waitUntil(WAIT_TIMEOUT_MILLIS) {
             composeRule.onAllNodes(hasText(text)).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    private fun waitUntilNodeWithTagExists(tag: String) {
+        composeRule.waitUntil(WAIT_TIMEOUT_MILLIS) {
+            composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
         }
     }
 }
