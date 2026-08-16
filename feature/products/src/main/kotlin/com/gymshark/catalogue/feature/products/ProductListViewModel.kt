@@ -49,7 +49,11 @@ class ProductListViewModel
             load()
         }
 
-        /** Keeps whatever is currently on screen visible — and visible again on failure. */
+        /**
+         * Keeps whatever is currently on screen visible — and visible again on failure. Clears any
+         * unconsumed [ProductListUiState.Content.snackBarError] as the pull starts, so a new attempt
+         * dismisses the previous failure's snackbar rather than leaving it hanging over a fresh one.
+         */
         fun refresh() {
             val current = internalState.value
             if (current is ProductListUiState.Content) {
@@ -65,6 +69,12 @@ class ProductListViewModel
             }
         }
 
+        /**
+         * Consumes the one-shot refresh error once the UI has displayed it. The UI **must** call
+         * this: [ProductListUiState.Content.snackBarError] is state rather than an event, so an
+         * unconsumed error persists and re-shows on the next configuration change or return to
+         * this screen. [refresh] clears it too, so starting a new pull dismisses a visible snackbar.
+         */
         fun onRefreshErrorShown() {
             val current = internalState.value
             if (current is ProductListUiState.Content) {

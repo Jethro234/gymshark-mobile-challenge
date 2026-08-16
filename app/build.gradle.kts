@@ -47,6 +47,17 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     kspAndroidTest(libs.hilt.compiler)
 
+    constraints {
+        androidTestImplementation(libs.androidx.test.espresso.core) {
+            because(
+                "Compose's ui-test-junit4 pulls espresso-core in transitively to inject touch " +
+                    "events. 3.5.0 does that by reflecting on InputManager.getInstance(), removed " +
+                    "in Android 15+, so every instrumented test fails on API 35+ with " +
+                    "NoSuchMethodException. Constraint only — no test here uses Espresso directly.",
+            )
+        }
+    }
+
     // The macrobenchmark module only ever runs against :app's release build (measuring the
     // real, shrunk artefact), so its Baseline Profile generator output feeds straight back in.
     baselineProfile(project(":macrobenchmark"))

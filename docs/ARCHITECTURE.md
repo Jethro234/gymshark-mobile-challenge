@@ -141,6 +141,7 @@ sealed interface ProductListUiState {
     data class Content(
         val products: List<ProductUiModel>,
         val isRefreshing: Boolean = false,
+        val snackBarError: ErrorCause? = null,
     ) : ProductListUiState
     data object Empty : ProductListUiState
     data class Error(val cause: ErrorCause) : ProductListUiState
@@ -174,6 +175,18 @@ State is exposed as `StateFlow` via `stateIn(viewModelScope, WhileSubscribed(5_0
 
 `isRefreshing` lives inside `Content` rather than as a sibling state, because a
 pull-to-refresh must not blank the list the user is already looking at.
+
+`snackBarError` lives there for the same reason, from the other direction: a *failed*
+refresh must not blank the list either, so the cause rides alongside the content it
+failed to replace rather than becoming an `Error` state (§10.1, which specifies exactly
+this). It is `ErrorCause?`, not `Error?` — a transient message is not the same
+thing as a screen that has nothing to show, and typing it as the latter invites the two
+to be confused.
+
+The cost is that a one-shot event is being carried in long-lived state, so it must be
+consumed: the UI calls `onRefreshErrorShown()` once the snackbar has been displayed, and
+`refresh()` clears it again on the next pull. Without that, the error never clears and
+replays on the next configuration change or return to the screen.
 
 ---
 

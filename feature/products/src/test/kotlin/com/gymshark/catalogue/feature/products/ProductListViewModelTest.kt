@@ -13,6 +13,7 @@ import java.io.IOException
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ProductListViewModelTest {
@@ -122,7 +123,7 @@ class ProductListViewModelTest {
         }
 
     @Test
-    fun `refresh failure keeps the previous content on screen`() =
+    fun `refresh failure keeps the previous content on screen and carries the cause`() =
         runTest {
             val original = productFixture(id = "1", title = "Original")
             repository.seedCache(listOf(original))
@@ -138,12 +139,47 @@ class ProductListViewModelTest {
 
                 val refreshing = assertIs<ProductListUiState.Content>(awaitItem())
                 assertTrue(refreshing.isRefreshing)
+                assertNull(refreshing.snackBarError)
 
                 refreshGate.complete(Unit)
 
                 val afterFailure = assertIs<ProductListUiState.Content>(awaitItem())
                 assertFalse(afterFailure.isRefreshing)
+                assertEquals(ErrorCause.NoConnection, afterFailure.snackBarError)
                 assertEquals(initial.products, afterFailure.products)
+            }
+        }
+
+    /**
+     * The regression guard for the silent-refresh defect: showing the error once is not enough,
+     * it has to surface again every time. Two identical rounds, because the first implementation
+     * of this fix showed the snackbar once and then went quiet for good.
+     */
+    @Test
+    fun `each refresh failure surfaces its cause once the previous one was consumed`() =
+        runTest {
+            repository.seedCache(listOf(productFixture(id = "1")))
+            val viewModel = ProductListViewModel(repository)
+
+            viewModel.uiState.test {
+                assertIs<ProductListUiState.Content>(awaitItem())
+                repository.remoteProducts = Result.failure(IOException())
+
+                repeat(2) {
+                    val refreshGate = CompletableDeferred<Unit>()
+                    repository.fetchGate = refreshGate
+                    viewModel.refresh()
+
+                    // Starting a pull clears any error still on screen from the previous attempt.
+                    assertNull(assertIs<ProductListUiState.Content>(awaitItem()).snackBarError)
+
+                    refreshGate.complete(Unit)
+                    val failed = assertIs<ProductListUiState.Content>(awaitItem())
+                    assertEquals(ErrorCause.NoConnection, failed.snackBarError)
+
+                    viewModel.onRefreshErrorShown()
+                    assertNull(assertIs<ProductListUiState.Content>(awaitItem()).snackBarError)
+                }
             }
         }
 }
