@@ -20,12 +20,15 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,16 +57,25 @@ fun ProductListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val gridState = rememberSaveable(saver = LazyGridState.Saver) { LazyGridState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
-    ProductListScreen(
-        uiState = uiState,
-        gridState = gridState,
-        onProductClick = onProductClick,
-        sharedTransitionScope = sharedTransitionScope,
-        onRefresh = viewModel::refresh,
-        onRetry = viewModel::retry,
-        modifier = modifier,
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        ProductListScreen(
+            uiState = uiState,
+            gridState = gridState,
+            snackBarHostState = snackBarHostState,
+            onProductClick = onProductClick,
+            sharedTransitionScope = sharedTransitionScope,
+            onRefresh = viewModel::refresh,
+            onRetry = viewModel::retry,
+            onRefreshErrorShown = viewModel::onRefreshErrorShown,
+        )
+
+        SnackbarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).windowInsetsPadding(WindowInsets.safeDrawing),
+        )
+    }
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -71,17 +83,19 @@ fun ProductListScreen(
 internal fun ProductListScreen(
     uiState: ProductListUiState,
     gridState: LazyGridState,
+    snackBarHostState: SnackbarHostState,
     onProductClick: (productId: String, imageUrl: String?, imageWidth: Int?, imageHeight: Int?) -> Unit,
     sharedTransitionScope: SharedTransitionScope,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
+    onRefreshErrorShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
         is ProductListUiState.Loading -> LoadingState(modifier)
         is ProductListUiState.Empty -> EmptyState(modifier)
         is ProductListUiState.Error -> ErrorState(uiState.cause, onRetry, modifier)
-        is ProductListUiState.Content ->
+        is ProductListUiState.Content -> {
             ContentState(
                 state = uiState,
                 gridState = gridState,
@@ -90,6 +104,14 @@ internal fun ProductListScreen(
                 onRefresh = onRefresh,
                 modifier = modifier,
             )
+            uiState.snackBarError?.let {
+                val text = stringResource(it.cause.toMessageRes())
+                LaunchedEffect(Unit) {
+                    snackBarHostState.showSnackbar(text)
+                    onRefreshErrorShown()
+                }
+            }
+        }
     }
 }
 

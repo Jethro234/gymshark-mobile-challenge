@@ -53,7 +53,7 @@ class ProductListViewModel
         fun refresh() {
             val current = internalState.value
             if (current is ProductListUiState.Content) {
-                internalState.value = current.copy(isRefreshing = true)
+                internalState.value = current.copy(isRefreshing = true, snackBarError = null)
             }
             viewModelScope.launch {
                 val result = repository.refresh()
@@ -65,12 +65,20 @@ class ProductListViewModel
             }
         }
 
+        fun onRefreshErrorShown() {
+            val current = internalState.value
+            if (current is ProductListUiState.Content) {
+                internalState.value = current.copy(snackBarError = null)
+            }
+        }
+
         private fun refreshFailureState(cause: ErrorCause): ProductListUiState {
             val current = internalState.value
+            val error = ProductListUiState.Error(cause)
             return if (current is ProductListUiState.Content) {
-                current.copy(isRefreshing = false)
+                current.copy(isRefreshing = false, snackBarError = error)
             } else {
-                ProductListUiState.Error(cause)
+                error
             }
         }
 

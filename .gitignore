@@ -1,6 +1,26 @@
 # Machine-local agent permission grants — not shared configuration
 .claude/settings.local.json
 
+# Personal Compose-performance skills — third-party (Apache-2.0), copied from
+# skydoves/compose-performance-skills @ 1b32f81 into ~/.claude/skills-sources/.
+# Local tooling, not part of the project; the openspec skills above them are.
+.claude/skills/avoiding-subcomposition-pitfalls/
+.claude/skills/choosing-derivedstateof/
+.claude/skills/collecting-flows-safely/
+.claude/skills/configuring-lazy-prefetch/
+.claude/skills/debugging-recompositions/
+.claude/skills/deferring-state-reads/
+.claude/skills/migrating-to-modifier-node/
+.claude/skills/optimizing-lazy-layouts/
+.claude/skills/ordering-modifier-chains/
+.claude/skills/using-efficient-effects/
+.claude/skills/using-strong-skipping-correctly/
+
+# Compose audit skill — third-party (MIT; rules adapted from chrisbanes/skills,
+# Apache-2.0), copied from hamen/compose_skill @ f815c31 into
+# ~/.claude/skills-sources/. Local tooling, not part of the project.
+.claude/skills/jetpack-compose-audit/
+
 # macOS
 .DS_Store
 

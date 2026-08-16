@@ -20,6 +20,7 @@ sealed interface ProductListUiState {
         val screenTitle: String,
         val countLabel: String,
         val isRefreshing: Boolean = false,
+        val snackBarError: Error? = null,
     ) : ProductListUiState
 
     data object Empty : ProductListUiState
