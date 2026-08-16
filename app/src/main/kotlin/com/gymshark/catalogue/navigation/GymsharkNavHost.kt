@@ -69,14 +69,24 @@ fun GymsharkNavHost(modifier: Modifier = Modifier) {
                     entry<AppRoute.ProductList> {
                         ProductListScreen(
                             onProductClick = { productId, imageUrl, imageWidth, imageHeight ->
-                                backStack.add(
+                                val route =
                                     AppRoute.ProductDetail(
                                         productId = productId,
                                         imageUrl = imageUrl,
                                         imageWidth = imageWidth,
                                         imageHeight = imageHeight,
-                                    ),
-                                )
+                                    )
+                                // Not a cosmetic dedupe. `NavEntry` derives `contentKey` as
+                                // `key.toString()` and `AppRoute.ProductDetail` is a data class, so
+                                // a double tap pushes two entries sharing one `contentKey`. Popping
+                                // the upper one then runs both decorators' `onPop` against that
+                                // shared key — `removeState` and `clearKey` — destroying the saved
+                                // state and `ViewModelStore` of the duplicate still underneath. It
+                                // fails silently: back appears to do nothing, the selected size is
+                                // gone and the product refetches. Covered by
+                                // `ProductListDoubleTapTest`.
+                                if (backStack.last() == route) return@ProductListScreen
+                                backStack.add(route)
                             },
                             sharedTransitionScope = this@SharedTransitionLayout,
                         )
